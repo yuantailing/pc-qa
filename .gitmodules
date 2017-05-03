@@ -1,0 +1,3 @@
+[submodule "localqa"]
+	path = localqa
+	url = git@github.com:yuantailing/localqa.git
