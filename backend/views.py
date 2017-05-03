@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -10,7 +16,7 @@ def json_response(data):
 
 def query(request):
     text = request.POST.get('text')
-    data = {'error': 0, 'msg': 'Your input is {0}'.format(text)}
+    data = {'error': 0, 'msg': 'Input: {0}'.format(text)}
     return json_response(data)
 
 def tips(request):
