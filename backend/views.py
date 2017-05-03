@@ -9,7 +9,8 @@ def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 def query(request):
-    data = {'error': 0, 'msg': 'response from backend:query'}
+    text = request.POST.get('text')
+    data = {'error': 0, 'msg': 'Your input is {0}'.format(text)}
     return json_response(data)
 
 def tips(request):

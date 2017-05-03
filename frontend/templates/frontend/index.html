@@ -6,20 +6,74 @@
         <title>QA</title>
         <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{% static 'frontend/css/style.css' %}" />
+        <!--link rel="stylesheet" type="text/css" href="{% static 'frontend/css/style.css' %}" /-->
         <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
         <script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
         <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script src="{% static 'frontend/js/index.js' %}"></script>
+        <!--script src="{% static 'frontend/js/index.js' %}"></script-->
         <script>
             var api_query = "{% url 'backend:query' %}";
             var api_tips = "{% url 'backend:tips' %}";
         </script>
+        <script>
+$(document).init(function() {
+    $('#input-query').bind('keydown', function(e) {
+        var event = e || window.event;
+        var code = event.keyCode || event.which || event.charCode;
+        if (code == '\n'.charCodeAt(0) || code == '\r'.charCodeAt(0)) {
+            e.preventDefault();
+            $("#button-query").click();
+        }
+    }).focus();
+    $('#button-query').click(function() {
+        $.post(api_query, {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            text: $('#input-query')[0].value,
+        }, function(data) {
+            if (data.error) {
+                alert(data.msg);
+                return;
+            }
+            var div = $('<div></div>');
+            var p = $('<p></p>');
+            p.text(JSON.stringify(data.msg));
+            div.addClass('view-query');
+            div.append(p);
+            $('.view').append(div);
+        });
+    });
+    $('#button-tips').click(function() {
+        $.post(api_tips, {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+        }, function(data) {
+            if (data.error) {
+                alert(data.msg);
+                return;
+            }
+            var div = $('<div></div>');
+            var p = $('<p></p>');
+            p.text(JSON.stringify(data.msg));
+            div.addClass('view-tips');
+            div.append(p);
+            $('.view').append(div);
+        });
+    });
+});
+        </script>
+        <style>
+
+        </style>
     </head>
     <body>
         {% csrf_token %}
-        <div class="container">
-            <h2>frontend:index</h2>
+        <div class="container" align="center">
+            <div class="view" style="height: 600px; overflow: auto;">
+            </div>
+            <div>
+                <input id="input-query" style="width: 600px;"/>
+                <button id="button-query">Submit</button>
+                <button id="button-tips">Tips</button>
+            </div>
         </div>
     </body>
 </html>
