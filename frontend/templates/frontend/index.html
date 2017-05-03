@@ -59,6 +59,7 @@ function init() {
             wrapper.append(div);
             $.map(data.msg.products, function(p) {
                 var div = $('.templates .computer-summary').clone();
+                div.find('#image').attr('src', p['img']);
                 div.find('#title').text(p['型号']);
                 div.find('#title').attr('href', p['link']);
                 div.find('#price').text(p['price']);
@@ -107,7 +108,7 @@ function init() {
             <div class="computer-summary">
                 <div class="row">
                     <div class="col-sm-2">
-                        <img style="width: 80%" src="http://2b.zol-img.com.cn/product/180_80x60/165/ceVWQuduZWXQI.jpg"/>
+                        <img id="image" style="width: 80%"/>
                     </div>
                     <div class="col-sm-10">
                         <div class="row">
