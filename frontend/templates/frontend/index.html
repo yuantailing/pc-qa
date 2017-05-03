@@ -1,0 +1,25 @@
+{% load i18n static %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+        <meta content="qa" name="description" />
+        <title>QA</title>
+        <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{% static 'frontend/css/style.css' %}" />
+        <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+        <script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="{% static 'frontend/js/index.js' %}"></script>
+        <script>
+            var api_query = "{% url 'backend:query' %}";
+            var api_tips = "{% url 'backend:tips' %}";
+        </script>
+    </head>
+    <body>
+        {% csrf_token %}
+        <div class="container">
+            <h2>frontend:index</h2>
+        </div>
+    </body>
+</html>
