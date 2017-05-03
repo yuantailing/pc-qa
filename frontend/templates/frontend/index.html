@@ -16,7 +16,18 @@
             var api_tips = "{% url 'backend:tips' %}";
         </script>
         <script>
-$(document).init(function() {
+$(document).ready(init);
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+function init() {
     $('#input-query').bind('keydown', function(e) {
         var event = e || window.event;
         var code = event.keyCode || event.which || event.charCode;
@@ -34,12 +45,30 @@ $(document).init(function() {
                 alert(data.msg);
                 return;
             }
-            var div = $('<div></div>');
-            var p = $('<p></p>');
-            p.text(JSON.stringify(data.msg));
-            div.addClass('view-query');
-            div.append(p);
-            $('.view').append(div);
+            console.log(data.msg);
+            var wrapper = $('<div></div>');
+            wrapper.addClass('view-query');
+            var div = $('<div></div>')
+            $.map(data.msg.constraints, function(c) {
+                var span = $('<span></span>');
+                span.text(c);
+                span.addClass('label');
+                span.css('background-color', getRandomColor());
+                div.append(span);
+            });
+            wrapper.append(div);
+            $.map(data.msg.products, function(p) {
+                var div = $('.templates .computer-summary').clone();
+                div.find('#title').text(p['型号']);
+                div.find('#title').attr('href', p['link']);
+                div.find('#price').text(p['price']);
+                div.find('#cpu').text(p['CPU型号']);
+                div.find('#memory').text(p['内存容量']);
+                div.find('#disk').text(p['硬盘容量']);
+                div.find('#screen').text(p['屏幕尺寸']);
+                wrapper.append(div);
+            });
+            $('.view').empty().append(wrapper);
         });
     });
     $('#button-tips').click(function() {
@@ -58,7 +87,7 @@ $(document).init(function() {
             $('.view').append(div);
         });
     });
-});
+}
         </script>
         <style>
 
@@ -67,12 +96,32 @@ $(document).init(function() {
     <body>
         {% csrf_token %}
         <div class="container" align="center">
-            <div class="view" style="height: 600px; overflow: auto;">
-            </div>
+            <div class="view" style="height: 600px; overflow: auto;"></div>
             <div>
                 <input id="input-query" style="width: 600px;"/>
                 <button id="button-query">Submit</button>
                 <button id="button-tips">Tips</button>
+            </div>
+        </div>
+        <div class="templates" hidden>
+            <div class="computer-summary">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <img style="width: 80%" src="http://2b.zol-img.com.cn/product/180_80x60/165/ceVWQuduZWXQI.jpg"/>
+                    </div>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-9"><a id="title" target="_blank">名称</a></div>
+                            <div class="col-sm-3" id="price" style="color: red">价格</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3" id="cpu">CPU</div>
+                            <div class="col-sm-3" id="memory">内存</div>
+                            <div class="col-sm-3" id="disk">硬盘</div>
+                            <div class="col-sm-3" id="screen">屏幕</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

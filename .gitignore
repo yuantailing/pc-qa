@@ -3,6 +3,7 @@
 
 /static/
 /media/
+/data/
 
 /qa/settings.py
 /db.sqlite3

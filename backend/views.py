@@ -8,15 +8,34 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 import json
+import os
 
 # Create your views here.
+
+DATA_ROOT = 'data'
+
+with open(os.path.join(DATA_ROOT, 'series.json')) as f:
+    series = json.load(f)
 
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 def query(request):
     text = request.POST.get('text')
-    data = {'error': 0, 'msg': 'Input: {0}'.format(text)}
+    v = []
+    for s in series:
+        for p in s['products']:
+            if len(v) < 5:
+                for t in p['内存容量']:
+                    if -1 != t.find('8GB'):
+                        v.append(p)
+                        break
+    data = {'error': 0,
+            'msg': {
+                'constraints': ['内存：8GB', '外观：轻薄'],
+                'products': v,
+            },
+        }
     return json_response(data)
 
 def tips(request):
