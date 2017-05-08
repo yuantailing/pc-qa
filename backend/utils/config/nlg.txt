@@ -1,0 +1,1 @@
+perf_cpu_medium	<name> 是一款中端CPU，主频 <freq> 能满足你的日常办公需求，可以运行小型游戏

@@ -8,6 +8,9 @@
 不(?:要|喜欢|想要).*brand	brand_no	10
 (?:要|喜欢|想要).*brand	brand_assign	9
 
+性能(?:如何|怎么样)	ask_performance	10
+够用	ask_performance	10
+
 ^\s*$	no_input	1
 
 (?:你|您)好	hi	1

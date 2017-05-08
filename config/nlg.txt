@@ -2,6 +2,6 @@ price_dec	好的，为您推荐一款便宜点的电脑
 price_dec	我们为您推荐一款更便宜的电脑
 price_dec_failed	这个配置没有更便宜的电脑了
 price_dec_failed	对不起，这个配置没有更便宜的电脑了
-brand_no	好的，不再为您推荐<brand>牌的电脑
-brand_no	好的，不再为您推荐<brand>牌的笔记本电脑
+brand_no	好的，不再为您推荐 <brand> 电脑
+brand_no	好的，不再为您推荐 <brand> 牌的笔记本电脑
 brand_assign	好的，下面只为您推荐 <brand> 牌的笔记本电脑
