@@ -36,6 +36,51 @@ def random_nlg(act_type, kw):
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
+high_config = {
+    'brand': {'in': None, 'not': ['others']},
+    'cpu': {'gte': 2.3, 'lte': None},
+    'memory': {'gte': 16, 'lte': None},
+    'disk': {'gte': 1000, 'lte': None},
+    'gpu': {'gte': 6, 'lte': None},
+    'screen': {'gte': None, 'lte': None},
+    'weight': {'gte': None, 'lte': None},
+    'market_date': {'gte': None, 'lte': None},
+    'price': {'gte': None, 'lte': 8000},
+    'seller': {'gte': 10, 'lte': None},
+    'price_pos': 0.7,
+    'config_exist': True,
+}
+
+medium_config = {
+    'brand': {'in': None, 'not': ['others']},
+    'cpu': {'gte': 2, 'lte': None},
+    'memory': {'gte': 8, 'lte': None},
+    'disk': {'gte': 500, 'lte': None},
+    'gpu': {'gte': 4, 'lte': None},
+    'screen': {'gte': None, 'lte': None},
+    'weight': {'gte': None, 'lte': None},
+    'market_date': {'gte': None, 'lte': None},
+    'price': {'gte': None, 'lte': 8000},
+    'seller': {'gte': 10, 'lte': None},
+    'price_pos': 0.5,
+    'config_exist': True,
+}
+
+low_config = {
+    'brand': {'in': None, 'not': ['others']},
+    'cpu': {'gte': None, 'lte': 2},
+    'memory': {'gte': 16, 'lte': 4},
+    'disk': {'gte': None, 'lte': 500},
+    'gpu': {'gte': None, 'lte': 4},
+    'screen': {'gte': None, 'lte': None},
+    'weight': {'gte': None, 'lte': None},
+    'market_date': {'gte': None, 'lte': None},
+    'price': {'gte': None, 'lte': 8000},
+    'seller': {'gte': 10, 'lte': None},
+    'price_pos': 0.3,
+    'config_exist': True,
+}
+
 def query(request):
     if request.POST.get('status'):
         status = json.loads(request.POST.get('status'))
@@ -52,6 +97,7 @@ def query(request):
                 'price': {'gte': None, 'lte': 8000},
                 'seller': {'gte': 10, 'lte': None},
                 'price_pos': 0.5,
+                'config_exist': False,
                 }
     def check_between(product, func, rng):
         if rng['gte'] is not None or rng['lte'] is not None:
@@ -89,7 +135,15 @@ def query(request):
         old_status = copy.deepcopy(status)
         act = pattern['_act_type']
         msg = '无逻辑匹配 _act_type={0}'.format(act)
-        if act == 'price_dec':
+        if act == 'low_demand':
+            status = copy.deepcopy(low_config)
+        elif act == 'medium_demand':
+            status = copy.deepcopy(medium_config)
+        elif act == 'high_demand':
+            status = copy.deepcopy(high_config)
+        elif act=='recommend_without_config' or status['config_exist'] == False:
+            msg = random_nlg('ask_purpose', {})
+        elif act == 'price_dec':
             status['price']['lte'] -= 1000
             if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
             if len(search_once(status)) < 1:

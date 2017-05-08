@@ -13,6 +13,11 @@
 
 ^\s*$	no_input	1
 
+(?:要|想要|买|想买|推荐)	recommend_without_config	8
+(?:办公|斗地主|网页|看电影|听歌)	low_demand	8
+(?:英雄联盟|LOL|Dota|炉石|编程|游戏)	medium_demand	8
+(?:单机游戏|跳伞|设计|画图|渲染|建模)	high_demand	10
+
 (?:你|您)好	hi	1
 (?:谢谢|感谢)+(?:你)?	thx	10
 再见	bye	10
