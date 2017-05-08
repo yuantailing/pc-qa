@@ -170,7 +170,7 @@ def query(request):
             else:
                 msg = random_nlg('price_dec', {})
         elif act == 'brand_no':
-            bd = pattern['brand']
+            bd = pattern['brand'][0]
             regular_bd = pattern['_regular']['brand'][0]
             if regular_bd not in status['brand']['not']:
                 status['brand']['not'].append(regular_bd)
