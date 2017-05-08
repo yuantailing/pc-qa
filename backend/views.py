@@ -135,23 +135,7 @@ def query(request):
         old_status = copy.deepcopy(status)
         act = pattern['_act_type']
         msg = '无逻辑匹配 _act_type={0}'.format(act)
-        if act == 'low_demand':
-            status = copy.deepcopy(low_config)
-        elif act == 'medium_demand':
-            status = copy.deepcopy(medium_config)
-        elif act == 'high_demand':
-            status = copy.deepcopy(high_config)
-        elif act=='recommend_without_config' or status['config_exist'] == False:
-            msg = random_nlg('ask_purpose', {})
-        elif act == 'price_dec':
-            status['price']['lte'] -= 1000
-            if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('price_dec_failed', {})
-            else:
-                msg = random_nlg('price_dec', {})
-        elif act == 'brand_no':
+        if act == 'brand_no':
             bd = pattern['brand'][0]
             regular_bd = pattern['_regular']['brand'][0]
             if status['brand']['in'] is not None and regular_bd in status['brand']['in']:
@@ -168,6 +152,26 @@ def query(request):
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
             msg = random_nlg('brand_assign', {'brand': bd})
+        bd = copy.deepcopy(status['brand'])
+        if act == 'low_demand':
+            status = copy.deepcopy(low_config)
+            status['brand'] = copy.deepcopy(bd)
+        elif act == 'medium_demand':
+            status = copy.deepcopy(medium_config)
+            status['brand'] = copy.deepcopy(bd)
+        elif act == 'high_demand':
+            status = copy.deepcopy(high_config)
+            status['brand'] = copy.deepcopy(bd)
+        elif act=='recommend_without_config' or status['config_exist'] == False:
+            msg = random_nlg('ask_purpose', {})
+        elif act == 'price_dec':
+            status['price']['lte'] -= 1000
+            if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('price_dec_failed', {})
+            else:
+                msg = random_nlg('price_dec', {})
         elif act == 'ask_performance':
             msg = perfs.cpu(status['last_products'][0])
 
