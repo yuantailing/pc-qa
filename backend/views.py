@@ -69,7 +69,7 @@ medium_config = {
 low_config = {
     'brand': {'in': None, 'not': ['others']},
     'cpu': {'gte': None, 'lte': 2},
-    'memory': {'gte': 16, 'lte': 4},
+    'memory': {'gte': None, 'lte': 4},
     'disk': {'gte': None, 'lte': 500},
     'gpu': {'gte': None, 'lte': 4},
     'screen': {'gte': None, 'lte': None},
@@ -156,12 +156,27 @@ def query(request):
         if act == 'low_demand':
             status = copy.deepcopy(low_config)
             status['brand'] = copy.deepcopy(bd)
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('demand_failed', {})
+            else:
+                msg = random_nlg('demand_level', {'level': '入门'})
         elif act == 'medium_demand':
             status = copy.deepcopy(medium_config)
             status['brand'] = copy.deepcopy(bd)
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('demand_failed', {})
+            else:
+                msg = random_nlg('demand_level', {'level': '大众'})
         elif act == 'high_demand':
             status = copy.deepcopy(high_config)
             status['brand'] = copy.deepcopy(bd)
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('demand_failed', {})
+            else:
+                msg = random_nlg('demand_level', {'level': '高端'})
         elif act=='recommend_without_config' or status['config_exist'] == False:
             msg = random_nlg('ask_purpose', {})
         elif act == 'price_dec':
