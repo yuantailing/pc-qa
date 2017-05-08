@@ -2,11 +2,11 @@
 内存.*小了	memory_inc	10
 内存.*大	memory_inc	9
 内存.*小	memory_dec	9
-贵了|太贵	price_dec	10
+贵了|太贵|不便宜	price_dec	10
 便宜	price_dec	9
 
-不.+brand	brand_no	10
-.+brand	brand_yes	9
+不(?:要|喜欢|想要).*brand	brand_no	10
+(?:要|喜欢|想要).*brand	brand_assign	9
 
 ^\s*$	no_input	1
 

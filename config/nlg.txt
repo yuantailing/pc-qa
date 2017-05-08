@@ -4,3 +4,4 @@ price_dec_failed	这个配置没有更便宜的电脑了
 price_dec_failed	对不起，这个配置没有更便宜的电脑了
 brand_no	好的，不再为您推荐<brand>牌的电脑
 brand_no	好的，不再为您推荐<brand>牌的笔记本电脑
+brand_assign	好的，下面只为您推荐 <brand> 牌的笔记本电脑

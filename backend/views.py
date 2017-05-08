@@ -39,6 +39,7 @@ def is_ill(product):
     if '硬盘容量' not in product or len(product['硬盘容量']) == 0: return True
     if '显卡芯片' not in product or len(product['显卡芯片']) == 0: return True
     if '显存容量' not in product or len(product['显存容量']) == 0: return True
+    if '笔记本重量' not in product or len(product['笔记本重量']) == 0: return True
     return False
 
 def brand(product):
@@ -106,6 +107,23 @@ def gpu_rank(product):
     if re.match('^(\d)GB$', s): return {1:2, 2:4, 4:6, 8:8}[int(re.match('^(\d)GB$', s).group(1))]
     raise ValueError(s)
 
+def screen_size(product):
+    s = product['屏幕尺寸'][0]
+    if re.match('^(\d+(?:\.\d)?)英寸$', s): return float(re.match('^(\d+(?:\.\d)?)英寸$', s).group(1))
+    raise ValueError(s)
+
+def weight(product): # Kg
+    s = product['笔记本重量'][0]
+    if re.match('^(\d+(?:\.\d+)?)Kg$', s): return float(re.match('^(\d+(?:\.\d+)?)Kg$', s).group(1))
+    if re.match('^(\d+)g$', s): return float(re.match('^(\d+)g$', s).group(1)) * 0.001
+    raise ValueError(s)
+
+def market_date(product): # YYYYMM
+    s = product['上市时间'][0]
+    if re.match('^(\d{4})年(\d{1,2})(?:月)?$', s): return int(re.match('^(\d{4})年(\d{1,2})(?:月)?$', s).group(1)) * 100 + int(re.match('^(\d{4})年(\d{1,2})(?:月)?$', s).group(2))
+    if re.match('^(\d{4})(?:年)?$', s): return int(re.match('^(\d{4})(?:年)?$', s).group(1)) * 100
+    raise ValueError(s)
+
 def price(product):
     s = product['price'][0]
     if re.match('^\d+$', s):
@@ -114,6 +132,11 @@ def price(product):
         return int(float(re.match('^(\d+(?:\.\d+)?)万$', s).group(1)) * 10000)
     else:
         return None
+
+def seller_num(product):
+    s = product['seller_num'][0]
+    if re.match('^(\d+)商家在售$', s): return int(re.match('^(\d+)商家在售$', s).group(1))
+    return None
 
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -128,12 +151,18 @@ def query(request):
                 'memory': {'gte': 4, 'lte': None},
                 'disk': {'gte': 480, 'lte': None},
                 'gpu': {'gte': 4, 'lte': None},
-                'price': {'gte': None, 'lte': 7000},
+                'screen': {'gte': None, 'lte': None},
+                'weight': {'gte': None, 'lte': None},
+                'market_date': {'gte': None, 'lte': None},
+                'price': {'gte': None, 'lte': 8000},
+                'seller': {'gte': 10, 'lte': None},
                 'price_pos': 0.5,
                 }
-    def check_between(prop, stat):
-        if stat['gte'] is not None and (prop is None or prop < stat['gte']): return False
-        if stat['lte'] is not None and (prop is None or prop > stat['lte']): return False
+    def check_between(product, func, stat):
+        if stat['gte'] is not None or stat['lte'] is not None:
+            prop = func(product)
+            if stat['gte'] is not None and (prop is None or prop < stat['gte']): return False
+            if stat['lte'] is not None and (prop is None or prop > stat['lte']): return False
         return True
     def search_once(status):
         all = []
@@ -142,11 +171,15 @@ def query(request):
                 if is_ill(p): continue
                 if status['brand']['in'] is not None and brand(p) not in status['brand']['in']: continue
                 if brand(p) in status['brand']['not']: continue
-                if not check_between(cpu_freq(p), status['cpu']): continue
-                if not check_between(memory_size(p), status['memory']): continue
-                if not check_between(disk_size(p), status['disk']): continue
-                if not check_between(gpu_rank(p), status['gpu']): continue
-                if not check_between(price(p), status['price']): continue
+                if not check_between(p, cpu_freq, status['cpu']): continue
+                if not check_between(p, memory_size, status['memory']): continue
+                if not check_between(p, disk_size, status['disk']): continue
+                if not check_between(p, gpu_rank, status['gpu']): continue
+                if not check_between(p, screen_size, status['screen']): continue
+                if not check_between(p, weight, status['weight']): continue
+                if not check_between(p, market_date, status['market_date']): continue
+                if not check_between(p, price, status['price']): continue
+                if not check_between(p, seller_num, status['seller']): continue
                 all.append(p)
         return all
     text = request.POST.get('text')
@@ -164,7 +197,7 @@ def query(request):
         if act == 'price_dec':
             status['price']['lte'] -= 1000
             if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
-            if 0 == len(search_once(status)):
+            if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('price_dec_failed', {})
             else:
@@ -175,6 +208,13 @@ def query(request):
             if regular_bd not in status['brand']['not']:
                 status['brand']['not'].append(regular_bd)
             msg = random_nlg('brand_no', {'brand': bd})
+        elif act == 'brand_assign':
+            bd = pattern['brand'][0]
+            regular_bd = pattern['_regular']['brand'][0]
+            status['brand']['in'] = [regular_bd]
+            if regular_bd in status['brand']['not']:
+                status['brand']['not'].remove(regular_bd)
+            msg = random_nlg('brand_assign', {'brand': bd})
 
     all = search_once(status)
     all.sort(key=lambda p: price(p))

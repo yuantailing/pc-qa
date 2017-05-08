@@ -41,63 +41,83 @@ function init() {
         }
     }).focus();
     $('#button-query').click(function() {
-        $.post(api_query, {
-            csrfmiddlewaretoken: $.cookie('csrftoken'),
-            status: backend_status,
-            text: $('#input-query')[0].value,
-        }, function(data) {
-            if (data.error) {
-                alert(data.msg);
-                return;
-            }
-            console.log(data.msg);
-            backend_status = data.msg.status;
-            var wrapper = $('<div></div>');
-            wrapper.addClass('view-query');
-            $.map(data.msg.products, function(p) {
-                var div = $('.templates .computer-summary').clone();
-                div.find('#image').attr('src', p['img']);
-                div.find('#title').text(p['型号']);
-                div.find('#title').attr('href', p['link']);
-                div.find('#price').text(p['price']);
-                div.find('#cpu').text(p['CPU型号']);
-                div.find('#memory').text(p['内存容量']);
-                div.find('#disk').text(p['硬盘容量']);
-                div.find('#screen').text(p['屏幕尺寸']);
-                div.find('#cpu_freq').text(p['CPU主频']);
-                div.find('#gpu').text(p['显卡芯片']);
-                div.find('#gpu_size').text(p['显存容量']);
-                div.find('#market_time').text(p['上市时间']);
-                div.find('#weight').text(p['笔记本重量']);
+        $.ajax({
+            url: api_query,
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                status: backend_status,
+                text: $('#input-query')[0].value,
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert(data.msg);
+                    return;
+                }
+                console.log(data.msg);
+                backend_status = data.msg.status;
+                var wrapper = $('<div></div>');
+                wrapper.addClass('view-query');
+                $.map(data.msg.products, function(p) {
+                    var div = $('.templates .computer-summary').clone();
+                    div.find('#image').attr('src', p['img']);
+                    div.find('#title').text(p['型号']);
+                    div.find('#title').attr('href', p['link']);
+                    div.find('#price').text(p['price']);
+                    div.find('#cpu').text(p['CPU型号']);
+                    div.find('#memory').text(p['内存容量']);
+                    div.find('#disk').text(p['硬盘容量']);
+                    div.find('#screen').text(p['屏幕尺寸']);
+                    div.find('#cpu_freq').text(p['CPU主频']);
+                    div.find('#gpu').text(p['显卡芯片']);
+                    div.find('#gpu_size').text(p['显存容量']);
+                    div.find('#market_time').text(p['上市时间']);
+                    div.find('#weight').text(p['笔记本重量']);
+                    wrapper.append(div);
+                });
+                var div = $('.templates .message-show').clone();
+                div.find('#content').text(data.msg.message);
                 wrapper.append(div);
-            });
-            var div = $('.templates .message-show').clone();
-            div.find('#content').text(data.msg.message);
-            wrapper.append(div);
-            var div = $('.templates .debug-show').clone();
-            var debug_json = JSON.parse(backend_status);
-            delete debug_json.last_products;
-            div.JSONView(debug_json, { collapsed: false });
-            wrapper.append(div);
-            $('.view').empty().append(wrapper);
+                var div = $('.templates .debug-show').clone();
+                var debug_json = JSON.parse(backend_status);
+                delete debug_json.last_products;
+                div.JSONView(debug_json, { collapsed: false });
+                wrapper.append(div);
+                $('.view').empty().append(wrapper);
+            },
+            error: function(e) {
+                var wrapper = $('<div></div>');
+                wrapper.text('ajax failed');
+                $('.view').empty().append(wrapper);
+            }
         });
     });
     $('#button-tips').click(function() {
-        $.post(api_tips, {
-            csrfmiddlewaretoken: $.cookie('csrftoken'),
-            status: backend_status,
-        }, function(data) {
-            if (data.error) {
-                alert(data.msg);
-                return;
+        $.ajax({
+            url: api_tips,
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                status: backend_status,
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert(data.msg);
+                    return;
+                }
+                backend_status = data.status;
+                var div = $('<div></div>');
+                var p = $('<p></p>');
+                p.text(JSON.stringify(data.msg));
+                div.addClass('view-tips');
+                div.append(p);
+                $('.view').empty().append(div);
+            },
+            error: function(e) {
+                var wrapper = $('<div></div>');
+                wrapper.text('ajax failed');
+                $('.view').empty().append(wrapper);
             }
-            backend_status = data.status;
-            var div = $('<div></div>');
-            var p = $('<p></p>');
-            p.text(JSON.stringify(data.msg));
-            div.addClass('view-tips');
-            div.append(p);
-            $('.view').append(div);
         });
     });
 }
