@@ -76,7 +76,7 @@ def disk_size(product): # GB
 
 def gpu_rank(product):
     s = product['显卡芯片'][0]
-    if re.search('(?:GTX|Geforce|GeForce|GT) (\d+)', s): return int(re.search('(?:GTX|Geforce|GeForce|GT) (\d+)', s).group(1)[1])
+    if re.search('(?:GTX|Geforce|GeForce|GT) (\d+)', s): return int(re.search('(?:GTX|Geforce|GeForce|GT) (\d+)', s).group(1)[-2])
     s = product['显存容量'][0]
     if re.search('(?:\d+)M', s): return 0
     if s in ('共享内存容量', '共享系统内存', '共享系统内存容量', '动态共享内存'): return 0
