@@ -5,8 +5,12 @@ price_dec_failed	对不起，这个配置没有更便宜的电脑了
 brand_no	好的，不再为您推荐 <brand> 电脑
 brand_no	好的，不再为您推荐 <brand> 牌的笔记本电脑
 brand_assign	好的，下面只为您推荐 <brand> 牌的笔记本电脑
+
 ask_purpose	请问您一般用电脑做什么呢？
 demand_level	根据您的使用场景，给您推荐 <level> 配置的电脑
 demand_failed	当前条件下没有符合您需求的电脑了
 portable	为您推荐便携的电脑
 protable_failed	当前条件下没有便携的电脑
+
+config_change	好的，为您推荐<item_change>的电脑
+config_change_failed	对不起，当前配置下没有<item_change>的电脑了

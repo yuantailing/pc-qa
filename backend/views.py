@@ -117,6 +117,7 @@ def query(request):
         old_status = copy.deepcopy(status)
         act = pattern['_act_type']
         msg = '无逻辑匹配 _act_type={0}'.format(act)
+        # brand
         if act == 'brand_no':
             bd = pattern['brand'][0]
             regular_bd = pattern['_regular']['brand'][0]
@@ -134,14 +135,16 @@ def query(request):
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
             msg = random_nlg('brand_assign', {'brand': bd})
-        # bd = copy.deepcopy(status['brand'])
+        # portable
         elif act == 'portable':
             status['weight']['lte'] = 1.5
+            status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('protable_failed', {})
             else:
                 msg = random_nlg('portable', {})
+        # application
         elif act == 'low_demand':
             status.update(low_config)
             if len(search_once(status)) < 1:
@@ -163,8 +166,78 @@ def query(request):
                 msg = random_nlg('demand_failed', {})
             else:
                 msg = random_nlg('demand_level', {'level': '高端'})
-        elif act=='recommend_without_config' or status['config_exist'] == False:
+        # without config
+        elif act =='recommend_without_config' or status['config_exist'] == False:
             msg = random_nlg('ask_purpose', {})
+        # memory
+        elif act == 'memory_inc':
+            status['memory']['gte'] += 1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '内存更大'})
+            else:
+                msg = random_nlg('config_change', {'item_change': '内存更大'})
+        elif act == 'memory_dec':
+            status['memory']['gte'] -= 1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '内存稍小'})
+            else:
+                msg = random_nlg('config_change', {'item_change': '内存稍小'})
+        # disk
+        elif act == 'disk_inc':
+            status['disk']['gte'] += 100
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '硬盘更大'})
+            else:
+                msg = random_nlg('config_change', {'item_change': '硬盘更大'})
+        elif act == 'disk_dec':
+            status['disk']['gte'] -= 100
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '硬盘稍小'})
+            else:
+                msg = random_nlg('config_change', {'item_change': '硬盘稍小'})
+        # cpu
+        elif act == 'cpu_inc':
+            status['cpu']['gte'] += 0.1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': 'cpu更好'})
+            else:
+                msg = random_nlg('config_change', {'item_change': 'cpu更好'})
+        elif act == 'cpu_dec':
+            status['cpu']['gte'] -= 0.1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': 'cpu稍弱'})
+            else:
+                msg = random_nlg('config_change', {'item_change': 'cpu稍弱'})
+        # gpu
+        elif act == 'gpu_inc':
+            status['gpu']['gte'] += 1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': 'gpu更好'})
+            else:
+                msg = random_nlg('config_change', {'item_change': 'gpu更好'})
+        elif act == 'gpu_dec':
+            status['gpu']['gte'] -= 1
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': 'gpu稍弱'})
+            else:
+                msg = random_nlg('config_change', {'item_change': 'gpu稍弱'})
+        # price
         elif act == 'price_dec':
             status['price']['lte'] -= 1000
             if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
