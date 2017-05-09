@@ -166,9 +166,6 @@ def query(request):
                 msg = random_nlg('demand_failed', {})
             else:
                 msg = random_nlg('demand_level', {'level': '高端'})
-        # without config
-        elif act =='recommend_without_config' or status['config_exist'] == False:
-            msg = random_nlg('ask_purpose', {})
         # memory
         elif act == 'memory_inc':
             status['memory']['gte'] += 1
@@ -248,6 +245,10 @@ def query(request):
                 msg = random_nlg('price_dec', {})
         elif act == 'ask_performance':
             msg = perfs.cpu(status['last_products'][0])
+        
+        # without config
+        if act =='recommend_without_config' or status['config_exist'] == False:
+            msg = random_nlg('ask_purpose', {})
 
     all = search_once(status)
     all.sort(key=lambda p: props.price(p))
