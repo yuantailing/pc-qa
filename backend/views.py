@@ -55,10 +55,10 @@ medium_config = {
 }
 
 low_config = {
-    'cpu': {'gte': None, 'lte': 2},
-    'memory': {'gte': None, 'lte': 4},
-    'disk': {'gte': None, 'lte': 500},
-    'gpu': {'gte': None, 'lte': 4},
+    'cpu': {'gte': 1, 'lte': None},
+    'memory': {'gte': 1, 'lte': None},
+    'disk': {'gte': 256, 'lte': None},
+    'gpu': {'gte': 1, 'lte': None},
     'price_pos': 0.3,
     'config_exist': True,
 }
