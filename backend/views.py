@@ -245,10 +245,12 @@ def query(request):
                 msg = random_nlg('price_dec', {})
         elif act == 'ask_performance':
             msg = perfs.cpu(status['last_products'][0])
-        
         # without config
-        if act =='recommend_without_config' or status['config_exist'] == False:
+        elif act =='recommend_without_config':
             msg = random_nlg('ask_purpose', {})
+
+    if status['config_exist'] == False:
+        msg = random_nlg('ask_purpose', {})
 
     all = search_once(status)
     all.sort(key=lambda p: props.price(p))
