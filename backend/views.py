@@ -37,46 +37,28 @@ def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 high_config = {
-    'brand': {'in': None, 'not': ['others']},
     'cpu': {'gte': 2.3, 'lte': None},
     'memory': {'gte': 16, 'lte': None},
     'disk': {'gte': 1000, 'lte': None},
     'gpu': {'gte': 6, 'lte': None},
-    'screen': {'gte': None, 'lte': None},
-    'weight': {'gte': None, 'lte': None},
-    'market_date': {'gte': None, 'lte': None},
-    'price': {'gte': None, 'lte': 8000},
-    'seller': {'gte': 10, 'lte': None},
     'price_pos': 0.7,
     'config_exist': True,
 }
 
 medium_config = {
-    'brand': {'in': None, 'not': ['others']},
     'cpu': {'gte': 2, 'lte': None},
     'memory': {'gte': 8, 'lte': None},
     'disk': {'gte': 500, 'lte': None},
     'gpu': {'gte': 4, 'lte': None},
-    'screen': {'gte': None, 'lte': None},
-    'weight': {'gte': None, 'lte': None},
-    'market_date': {'gte': None, 'lte': None},
-    'price': {'gte': None, 'lte': 8000},
-    'seller': {'gte': 10, 'lte': None},
     'price_pos': 0.5,
     'config_exist': True,
 }
 
 low_config = {
-    'brand': {'in': None, 'not': ['others']},
     'cpu': {'gte': None, 'lte': 2},
     'memory': {'gte': None, 'lte': 4},
     'disk': {'gte': None, 'lte': 500},
     'gpu': {'gte': None, 'lte': 4},
-    'screen': {'gte': None, 'lte': None},
-    'weight': {'gte': None, 'lte': None},
-    'market_date': {'gte': None, 'lte': None},
-    'price': {'gte': None, 'lte': 8000},
-    'seller': {'gte': 10, 'lte': None},
     'price_pos': 0.3,
     'config_exist': True,
 }
@@ -94,7 +76,7 @@ def query(request):
                 'screen': {'gte': None, 'lte': None},
                 'weight': {'gte': None, 'lte': None},
                 'market_date': {'gte': None, 'lte': None},
-                'price': {'gte': None, 'lte': 8000},
+                'price': {'gte': None, 'lte': 10000},
                 'seller': {'gte': 10, 'lte': None},
                 'price_pos': 0.5,
                 'config_exist': False,
@@ -152,26 +134,30 @@ def query(request):
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
             msg = random_nlg('brand_assign', {'brand': bd})
-        bd = copy.deepcopy(status['brand'])
-        if act == 'low_demand':
-            status = copy.deepcopy(low_config)
-            status['brand'] = copy.deepcopy(bd)
+        # bd = copy.deepcopy(status['brand'])
+        elif act == 'portable':
+            status['weight']['lte'] = 1.5
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('protable_failed', {})
+            else:
+                msg = random_nlg('portable', {})
+        elif act == 'low_demand':
+            status.update(low_config)
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('demand_failed', {})
             else:
                 msg = random_nlg('demand_level', {'level': '入门'})
         elif act == 'medium_demand':
-            status = copy.deepcopy(medium_config)
-            status['brand'] = copy.deepcopy(bd)
+            status.update(medium_config)
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('demand_failed', {})
             else:
                 msg = random_nlg('demand_level', {'level': '大众'})
         elif act == 'high_demand':
-            status = copy.deepcopy(high_config)
-            status['brand'] = copy.deepcopy(bd)
+            status.update(high_config)
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('demand_failed', {})
@@ -194,6 +180,7 @@ def query(request):
     all.sort(key=lambda p: props.price(p))
     n = len(all)
     v = [all[int(n * status['price_pos'])]]
+    # friendly_display(v)
     status['last_products'] = v
     data = {'error': 0,
             'msg': {

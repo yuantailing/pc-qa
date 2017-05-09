@@ -8,3 +8,5 @@ brand_assign	好的，下面只为您推荐 <brand> 牌的笔记本电脑
 ask_purpose	请问您一般用电脑做什么呢？
 demand_level	根据您的使用场景，给您推荐 <level> 配置的电脑
 demand_failed	当前条件下没有符合您需求的电脑了
+portable	为您推荐便携的电脑
+protable_failed	当前条件下没有便携的电脑
