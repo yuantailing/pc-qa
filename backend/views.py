@@ -41,24 +41,28 @@ def query(request):
     else:
         status = {
                 'brand': {'in': None, 'not': []},
-                'cpu': {'gte': None, 'lte': None},
-                'memory': {'gte': None, 'lte': None},
-                'disk': {'gte': None, 'lte': None},
-                'gpu': {'gte': None, 'lte': None},
-                'screen': {'gte': None, 'lte': None},
-                'weight': {'gte': None, 'lte': None},
-                'market_date': {'gte': None, 'lte': None},
-                'price': {'gte': None, 'lte': None},
-                'seller': {'gte': None, 'lte': None},
+                'cpu': [None],
+                'memory': [None],
+                'disk': [None],
+                'gpu': [None],
+                'screen': [None],
+                'weight': [None],
+                'market_date': [None],
+                'price': [None],
+                'seller': [None],
                 'price_pos': 0.5,
                 'config_exist': False,
                 }
     def check_between(product, func, rng):
-        if rng['gte'] is not None or rng['lte'] is not None:
-            prop = func(product)
-            if rng['gte'] is not None and (prop is None or prop < rng['gte']): return False
-            if rng['lte'] is not None and (prop is None or prop > rng['lte']): return False
-        return True
+        if rng[0] is None:
+            return True
+        prop = func(product)
+        if rng[0] == 'gt': return prop is not None and prop > rng[1]
+        if rng[0] == 'lt': return prop is not None and prop < rng[1]
+        if rng[0] == 'gte': return prop is not None and prop >= rng[1]
+        if rng[0] == 'lte': return prop is not None and prop <= rng[1]
+        if rng[0] == 'eq': return prop is not None and prop == rng[1]
+        raise ValueError(rng)
     def search_once(status):
         all = []
         for s in series:
@@ -109,7 +113,7 @@ def query(request):
             msg = random_nlg('brand_assign', {'brand': bd})
         # portable
         elif act == 'portable':
-            status['weight']['lte'] = 1.5
+            status['weight'] = ['lte', 1.5]
             status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
@@ -129,79 +133,9 @@ def query(request):
             status['price_pos'] = 0.75
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '高端'})
-        # memory
-        elif act == 'memory_inc':
-            status['memory']['gte'] = props.memory_size(status['last_products'][0]) + 1
-            status['config_exist'] = True
-            status['price_pos'] = 0.2
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '内存更大'})
-            else:
-                msg = random_nlg('config_change', {'item_change': '内存更大'})
-        elif act == 'memory_dec':
-            status['memory']['lte'] = props.memory_size(status['last_products'][0]) - 1
-            status['config_exist'] = True
-            status['price_pos'] = 0.8
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '内存稍小'})
-            else:
-                msg = random_nlg('config_change', {'item_change': '内存稍小'})
-        # disk
-        elif act == 'disk_inc':
-            status['disk']['gte'] += 100
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '硬盘更大'})
-            else:
-                msg = random_nlg('config_change', {'item_change': '硬盘更大'})
-        elif act == 'disk_dec':
-            status['disk']['gte'] -= 100
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '硬盘稍小'})
-            else:
-                msg = random_nlg('config_change', {'item_change': '硬盘稍小'})
-        # cpu
-        elif act == 'cpu_inc':
-            status['cpu']['gte'] += 0.1
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': 'cpu更好'})
-            else:
-                msg = random_nlg('config_change', {'item_change': 'cpu更好'})
-        elif act == 'cpu_dec':
-            status['cpu']['gte'] -= 0.1
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': 'cpu稍弱'})
-            else:
-                msg = random_nlg('config_change', {'item_change': 'cpu稍弱'})
-        # gpu
-        elif act == 'gpu_inc':
-            status['gpu']['gte'] += 1
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': 'gpu更好'})
-            else:
-                msg = random_nlg('config_change', {'item_change': 'gpu更好'})
-        elif act == 'gpu_dec':
-            status['gpu']['gte'] -= 1
-            status['config_exist'] = True
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': 'gpu稍弱'})
-            else:
-                msg = random_nlg('config_change', {'item_change': 'gpu稍弱'})
         # price
         elif act == 'price_dec':
-            status['price']['lte'] = props.price(status['last_products'][0]) - 1
+            status['price'] = ['lte', props.price(status['last_products'][0]) - 1]
             status['price_pos'] = 0.8
             if len(search_once(status)) < 1:
                 status = old_status
@@ -213,6 +147,30 @@ def query(request):
         # without config
         elif act =='recommend_without_config':
             msg = random_nlg('ask_purpose', {})
+
+        constraints_adjust_settings = [
+            # (NLU里的关键词  status里的键  props里的函数  (inc成功NLG参数  失败NLG参数), (dec成功NLG参数  失败NLG参数))
+            ('cpu', 'cpu', props.cpu_freq, ('cpu更好', ), ('cpu稍弱', )),
+            ('memory', 'memory', props.memory_size, ('内存更大', ), ('内存稍小', )),
+            ('disk', 'disk', props.disk_size, ('硬盘更大', ), ('硬盘更小', )),
+            ('gpu', 'gpu', props.gpu_rank, ('gpu更好', ), ('gpu稍弱', )),
+        ]
+        for t in constraints_adjust_settings:
+            nlukey, statuskey, propfn, incnlgparam, decnlgparam = t
+            direction = None
+            if act == '{0}_inc'.format(nlukey):
+                direction, pricepos, nlgparam = 'gt', 0.2, incnlgparam
+            elif act == '{0}_dec'.format(nlukey):
+                direction, pricepos, nlgparam = 'lt', 0.8, decnlgparam
+            if direction is not None:
+                status[statuskey] = [direction, propfn(status['last_products'][0])]
+                status['price_pos'] = pricepos
+                status['config_exist'] = True
+                if len(search_once(status)) < 1:
+                    status = old_status
+                    msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]})
+                else:
+                    msg = random_nlg('config_change', {'item_change': nlgparam[0]})
 
     if status['config_exist'] == False:
         msg = random_nlg('ask_purpose', {})
