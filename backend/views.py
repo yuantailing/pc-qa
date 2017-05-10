@@ -226,6 +226,7 @@ def query(request):
         if status.get('last_products'):
             # price
             if act == 'price_dec':
+                status['config_exist'] = True
                 status['price'] = ['lte', props.price(status['last_products'][0]) - 1]
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
@@ -233,6 +234,21 @@ def query(request):
                     msg = random_nlg('price_dec_failed', {}) + constraints_in_native(status)
                 else:
                     msg = random_nlg('price_dec', {})
+            elif act == 'price_limit':
+                status['config_exist'] = True
+                status['price'] = ['lte', int(pattern['price_str'][0])]
+                status['price_pos'] = 0.8
+                if len(search_once(status)) < 1:
+                    status = old_status
+                    msg = random_nlg('price_limit_failed', {'price': pattern['price_str'][0]}) + constraints_in_native(status)
+                else:
+                    msg = random_nlg('price_limit', {'price': pattern['price_str'][0]})
+            elif act == 'price_limit_cancle':
+                status['config_exist'] = True
+                status['price'] = [None]
+                status['price_pos'] = 0.5
+                msg = random_nlg('price_limit_cancle', {})
+            # ask color
             elif act == 'ask_color':
                 msg = random_nlg('ask_color', {'colors': '色、'.join(props.color(status['last_products'][0])) + '色'})
             # without config
@@ -273,6 +289,8 @@ def query(request):
                 performance = pattern['_regular']['performance'][0]
                 perffn = ask_performance[performance][0]
                 msg = perffn(status['last_products'][0])
+            if act == 'ask_performance_all':
+                msg = perfs.cpu(status['last_products'][0]) + perfs.gpu(status['last_products'][0])
 
     if status['config_exist'] == False:
         msg = random_nlg('ask_purpose', {})
