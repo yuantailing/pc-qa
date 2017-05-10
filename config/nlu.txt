@@ -34,6 +34,7 @@ performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 (?:高)性能(?:强)	high_demand	10
 
 (?:便携|重|轻|薄|厚)	portable	9
+续航.*(?:长|久)	long_battery_life	11
 
 ^\s*$	no_input	1
 (?:你|您)好	hi	1

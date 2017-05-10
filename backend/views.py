@@ -48,6 +48,7 @@ def query(request):
                 'gpu': [None],
                 'screen': [None],
                 'weight': [None],
+                'battery_life': [None],
                 'market_date': [None],
                 'price': [None],
                 'price_pos': 0.5,
@@ -83,6 +84,7 @@ def query(request):
                 if not check_between(p, props.gpu_rank, status['gpu']): continue
                 if not check_between(p, props.screen_size, status['screen']): continue
                 if not check_between(p, props.weight, status['weight']): continue
+                if not check_between(p, props.battery_life, status['battery_life']): continue
                 if not check_between(p, props.market_date, status['market_date']): continue
                 if not check_between(p, props.price, status['price']): continue
                 all.append(p)
@@ -152,6 +154,15 @@ def query(request):
                 msg = random_nlg('protable_failed', {})
             else:
                 msg = random_nlg('portable', {})
+        # long battery life
+        elif act == 'long_battery_life':
+            status['battery_life'] = ['gte', 5]
+            status['config_exist'] = True
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('long_battery_life_failed', {})
+            else:
+                msg = random_nlg('long_battery_life', {})
         # application
         elif act == 'low_demand':
             status['price_pos'] = 0.25
