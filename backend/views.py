@@ -141,6 +141,7 @@ def query(request):
     friendly_display(result)
     assert(result['error'] == 0)
     patternlist = result['msg']['patternlist']
+    last_status = copy.deepcopy(status)
     if 0 != len(patternlist):
         patternlist.sort(key=lambda d: (-d['_level'], -d['_matched_length']))
         pattern = patternlist[0]
@@ -239,6 +240,12 @@ def query(request):
             status['price_pos'] = 0.75
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '高端'})
+        elif act == 'rollback':
+            if 'last_status' in status:
+                status = status['last_status']
+                msg = random_nlg('rollback', {})
+            else:
+                msg = random_nlg('dont_know', {})
         
         if status.get('last_products'):
             # price
@@ -291,15 +298,15 @@ def query(request):
                 perffn = ask_performance[performance][0]
                 msg = perffn(status['last_products'][0])
 
-    if status['config_exist'] == False:
+    if status['config_exist'] == False and act != 'rollback':
         msg = random_nlg('ask_purpose', {})
 
     all = search_once(status)
     all.sort(key=lambda p: props.price(p))
     n = len(all)
     v = [all[int(n * status['price_pos'])]]
-    # friendly_display(v)
     status['last_products'] = v
+    status['last_status'] = last_status
     data = {'error': 0,
             'msg': {
                 'products': v,

@@ -1,7 +1,7 @@
-property.*(?:大|高|太?强|太?好)了	property_dec	10
-property.*(?:小|低|太?弱|太?差)了	property_inc	10
-property.*(?:大|高|强|好)	property_inc	9
-property.*(?:小|低|若|差)	property_dec	9
+property.*(?:大|高|太?强|太?好|太?贵)了	property_dec	12
+property.*(?:小|低|太?弱|太?差|太?便宜)了	property_inc	12
+property.*(?:大|高|强|好|贵)	property_inc	11
+property.*(?:小|低|若|差|便宜)	property_dec	11
 
 property.*太好了	property_dec	10
 property.*不够	property_inc	10
@@ -41,6 +41,9 @@ performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
 (?:便携|重|轻|薄|厚)	portable	9
 续航.*(?:长|久)	long_battery_life	11
+
+(?:上|前)一?(?:个|台|电脑)	rollback	10
+(?:刚才|刚刚)(?:的|那个|看的)	rollback	10
 
 ^\s*$	no_input	1
 (?:你|您)好	hi	1
