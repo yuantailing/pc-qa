@@ -32,52 +32,24 @@ def random_nlg(act_type, kw):
     assert(0 < len(all))
     return random.sample(all, 1)[0]['output']
 
-
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
-
-high_config = {
-    'cpu': {'gte': 2.3, 'lte': None},
-    'memory': {'gte': 16, 'lte': None},
-    'disk': {'gte': 1000, 'lte': None},
-    'gpu': {'gte': 6, 'lte': None},
-    'price_pos': 0.7,
-    'config_exist': True,
-}
-
-medium_config = {
-    'cpu': {'gte': 2, 'lte': None},
-    'memory': {'gte': 8, 'lte': None},
-    'disk': {'gte': 500, 'lte': None},
-    'gpu': {'gte': 4, 'lte': None},
-    'price_pos': 0.5,
-    'config_exist': True,
-}
-
-low_config = {
-    'cpu': {'gte': 1, 'lte': None},
-    'memory': {'gte': 1, 'lte': None},
-    'disk': {'gte': 256, 'lte': None},
-    'gpu': {'gte': 1, 'lte': None},
-    'price_pos': 0.3,
-    'config_exist': True,
-}
 
 def query(request):
     if request.POST.get('status'):
         status = json.loads(request.POST.get('status'))
     else:
         status = {
-                'brand': {'in': None, 'not': ['others']},
-                'cpu': {'gte': 1.5, 'lte': None},
-                'memory': {'gte': 4, 'lte': None},
-                'disk': {'gte': 480, 'lte': None},
-                'gpu': {'gte': 4, 'lte': None},
+                'brand': {'in': None, 'not': []},
+                'cpu': {'gte': None, 'lte': None},
+                'memory': {'gte': None, 'lte': None},
+                'disk': {'gte': None, 'lte': None},
+                'gpu': {'gte': None, 'lte': None},
                 'screen': {'gte': None, 'lte': None},
                 'weight': {'gte': None, 'lte': None},
                 'market_date': {'gte': None, 'lte': None},
-                'price': {'gte': None, 'lte': 10000},
-                'seller': {'gte': 10, 'lte': None},
+                'price': {'gte': None, 'lte': None},
+                'seller': {'gte': None, 'lte': None},
                 'price_pos': 0.5,
                 'config_exist': False,
                 }
@@ -146,38 +118,31 @@ def query(request):
                 msg = random_nlg('portable', {})
         # application
         elif act == 'low_demand':
-            status.update(low_config)
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('demand_failed', {})
-            else:
-                msg = random_nlg('demand_level', {'level': '入门'})
+            status['price_pos'] = 0.25
+            status['config_exist'] = True
+            msg = random_nlg('demand_level', {'level': '入门'})
         elif act == 'medium_demand':
-            status.update(medium_config)
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('demand_failed', {})
-            else:
-                msg = random_nlg('demand_level', {'level': '大众'})
+            status['price_pos'] = 0.5
+            status['config_exist'] = True
+            msg = random_nlg('demand_level', {'level': '大众'})
         elif act == 'high_demand':
-            status.update(high_config)
-            if len(search_once(status)) < 1:
-                status = old_status
-                msg = random_nlg('demand_failed', {})
-            else:
-                msg = random_nlg('demand_level', {'level': '高端'})
+            status['price_pos'] = 0.75
+            status['config_exist'] = True
+            msg = random_nlg('demand_level', {'level': '高端'})
         # memory
         elif act == 'memory_inc':
-            status['memory']['gte'] += 1
+            status['memory']['gte'] = props.memory_size(status['last_products'][0]) + 1
             status['config_exist'] = True
+            status['price_pos'] = 0.2
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('config_change_failed', {'item_change': '内存更大'})
             else:
                 msg = random_nlg('config_change', {'item_change': '内存更大'})
         elif act == 'memory_dec':
-            status['memory']['gte'] -= 1
+            status['memory']['lte'] = props.memory_size(status['last_products'][0]) - 1
             status['config_exist'] = True
+            status['price_pos'] = 0.8
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('config_change_failed', {'item_change': '内存稍小'})
@@ -236,8 +201,8 @@ def query(request):
                 msg = random_nlg('config_change', {'item_change': 'gpu稍弱'})
         # price
         elif act == 'price_dec':
-            status['price']['lte'] -= 1000
-            if status['price']['gte'] is not None: status['price']['gte'] = min(status['price']['gte'], status['price']['lte'] - 1000)
+            status['price']['lte'] = props.price(status['last_products'][0]) - 1
+            status['price_pos'] = 0.8
             if len(search_once(status)) < 1:
                 status = old_status
                 msg = random_nlg('price_dec_failed', {})
