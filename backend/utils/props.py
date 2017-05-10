@@ -16,6 +16,8 @@ def is_ill(product):
     if '显卡芯片' not in product or len(product['显卡芯片']) == 0: return True
     if '显存容量' not in product or len(product['显存容量']) == 0: return True
     if '笔记本重量' not in product or len(product['笔记本重量']) == 0: return True
+    if '上市时间' not in product or len(product['上市时间']) == 0: return True
+    if '外壳描述' not in product or len(product['外壳描述']) == 0: return True
     return False
 
 def brand(product):
