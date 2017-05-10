@@ -130,3 +130,9 @@ def color(product):
                 break
     assert res
     return res
+
+def battery_life(product):
+    s = product['续航时间'][0]
+    if re.match('^(?:\>)?(\d+(?:\.\d+)?)小时', s): return float(re.match('^(?:\>)?(\d+(?:\.\d+)?)小时', s).group(1))
+    if re.match('^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)小时', s): return float(re.match('^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)小时', s).group(1))
+    return None
