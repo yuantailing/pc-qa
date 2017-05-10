@@ -1,7 +1,7 @@
-property.*大了	property_dec	10
-property.*小了	property_inc	10
-property.*大	property_inc	9
-property.*小	property_dec	9
+property.*(?:大|高)了	property_dec	10
+property.*(?:小|低)了	property_inc	10
+property.*(?:大|高)	property_inc	9
+property.*(?:小|低)	property_dec	9
 
 property.*太好了	property_dec	10
 property.*不够	property_inc	10
@@ -9,7 +9,13 @@ property.*浪费	property_dec	9
 property.*跟不上	property_inc	9
 
 贵了|太贵|不便宜	price_dec	10
-便宜	price_dec	9
+便宜|(?:不要|别)这么贵	price_dec	9
+预算.*?\d+	price_limit	10
+(?:不|别).{0,1}(?:超过|高于|大于)(?P<price_str>\d{4,})	price_limit	10
+(?:价格|价钱)(?:低于|小于|限制|限制在)(?P<price_str>\d{4,})	price_limit	10
+(?:价格|价钱)(?:随便|可以高)	price_limit_cancle	10
+价格.*没关系	price_limit_cancle	10
+可以贵|取消价格限制|不限制?价格	price_limit_cancle	10
 
 不(?:要|喜欢|想要).*brand	brand_no	10
 (?:要|喜欢|想要).*brand	brand_assign	9
@@ -29,8 +35,8 @@ performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
 (?:要|想要|买|想买|推荐)	recommend_without_config	8
 (?:入门|办公|斗地主|网页|看电影|听歌)	low_demand	8
-(?:大众|一般|英雄联盟|LOL|Dota|炉石|编程|游戏)	medium_demand	9
-(?:高端|单机游戏|跳伞|设计|画图|渲染|建模)	high_demand	10
+(?:大众|一般|普通|英雄联盟|LOL|lol|DOTA|Dota|dota|炉石|编程|游戏)	medium_demand	9
+(?:高端|单机游戏|跳伞|设计|画图|渲染|建模|绘图)	high_demand	10
 (?:高)性能(?:强)	high_demand	10
 
 (?:便携|重|轻|薄|厚)	portable	9
