@@ -159,6 +159,11 @@ def query(request):
             if regular_bd not in status['brand']['not']:
                 status['brand']['not'].append(regular_bd)
             msg = random_nlg('brand_no', {'brand': bd})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + bd}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('brand_no', {'brand': bd})
         elif act == 'brand_assign':
             bd = pattern['brand'][0]
             status['config_exist'] = True
@@ -166,7 +171,11 @@ def query(request):
             status['brand']['in'] = [regular_bd]
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
-            msg = random_nlg('brand_assign', {'brand': bd})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': bd}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('brand_assign', {'brand': bd})
         # color
         elif act == 'to_ask_color':
             status['config_exist'] = True
@@ -181,7 +190,11 @@ def query(request):
                 status['color']['in'] = None
             if regular_cl not in status['color']['not']:
                 status['color']['not'].append(regular_cl)
-            msg = random_nlg('color_no', {'color': cl})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + cl + '色'}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('color_no', {'color': cl})
         elif act == 'color_assign':
             cl = pattern['color'][0]
             status['config_exist'] = True
@@ -190,7 +203,11 @@ def query(request):
             if regular_cl in status['color']['not']:
                 status['color']['not'].remove(regular_cl)
             friendly_display(status['color'])
-            msg = random_nlg('color_assign', {'color': cl})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': cl + '色'}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('color_assign', {'color': cl})
         # portable
         elif act == 'portable':
             status['weight'] = ['lte', 1.5]

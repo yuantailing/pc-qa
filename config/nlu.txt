@@ -1,7 +1,7 @@
-property.*(?:大|高)了	property_dec	10
-property.*(?:小|低)了	property_inc	10
-property.*(?:大|高)	property_inc	9
-property.*(?:小|低)	property_dec	9
+property.*(?:大|高|太?强|太?好)了	property_dec	10
+property.*(?:小|低|太?弱|太?差)了	property_inc	10
+property.*(?:大|高|强|好)	property_inc	9
+property.*(?:小|低|若|差)	property_dec	9
 
 property.*太好了	property_dec	10
 property.*不够	property_inc	10
