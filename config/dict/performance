@@ -4,3 +4,4 @@
 (?:内存|RAM|Ram|ram|运存)	memory
 (?:屏幕|显示屏|显示器)	screen
 (?:电池|续航)	battery
+(?:保修|质保)	guarantee

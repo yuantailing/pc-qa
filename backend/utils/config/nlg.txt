@@ -1,1 +1,3 @@
 perf_cpu_medium	<name> 是一款中端CPU，主频 <freq> 能满足你的日常办公需求，可以运行小型游戏
+guarantee	当前产品的质保时间是<text>
+battery_life	当前产品的续航时间是<text>

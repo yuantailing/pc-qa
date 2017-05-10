@@ -14,13 +14,11 @@ property.*跟不上	property_inc	9
 不(?:要|喜欢|想要).*brand	brand_no	10
 (?:要|喜欢|想要).*brand	brand_assign	9
 
-performance(?:如何|怎么样)	ask_performance	10
-performance够用(?:吗|么|？|\?)	ask_performance	10
+performance	ask_performance	9
+performance(?:如何|怎么样|吗|呢)	ask_performance	10
+performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
 不卡	ask_performance_all	9
-保修	ask_guarantee	10
-续航(?:多久)	ask_battery_life	9
-续航.*(长|久)	long_battery_life	10
 好看|漂亮|美观|时尚|时髦	ask_color	9
 
 (?:要|想要|买|想买|推荐)	recommend_without_config	8

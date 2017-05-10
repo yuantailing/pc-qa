@@ -130,11 +130,3 @@ def color(product):
                 break
     assert res
     return res
-
-def guarantee(product):
-    if not product['质保时间']:
-        return '没有质保相关信息'
-    msg = product['质保时间'][0]
-    if product['质保备注']:
-        msg += '：' + product['质保备注'][0]
-    return msg
