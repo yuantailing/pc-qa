@@ -141,6 +141,7 @@ def query(request):
     friendly_display(result)
     assert(result['error'] == 0)
     patternlist = result['msg']['patternlist']
+    last_status = copy.deepcopy(status)
     if 0 != len(patternlist):
         patternlist.sort(key=lambda d: (-d['_level'], -d['_matched_length']))
         pattern = patternlist[0]
@@ -159,6 +160,11 @@ def query(request):
             if regular_bd not in status['brand']['not']:
                 status['brand']['not'].append(regular_bd)
             msg = random_nlg('brand_no', {'brand': bd})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + bd}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('brand_no', {'brand': bd})
         elif act == 'brand_assign':
             bd = pattern['brand'][0]
             status['config_exist'] = True
@@ -166,7 +172,11 @@ def query(request):
             status['brand']['in'] = [regular_bd]
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
-            msg = random_nlg('brand_assign', {'brand': bd})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': bd}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('brand_assign', {'brand': bd})
         # color
         elif act == 'to_ask_color':
             status['config_exist'] = True
@@ -181,7 +191,11 @@ def query(request):
                 status['color']['in'] = None
             if regular_cl not in status['color']['not']:
                 status['color']['not'].append(regular_cl)
-            msg = random_nlg('color_no', {'color': cl})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + cl + '色'}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('color_no', {'color': cl})
         elif act == 'color_assign':
             cl = pattern['color'][0]
             status['config_exist'] = True
@@ -190,7 +204,11 @@ def query(request):
             if regular_cl in status['color']['not']:
                 status['color']['not'].remove(regular_cl)
             friendly_display(status['color'])
-            msg = random_nlg('color_assign', {'color': cl})
+            if len(search_once(status)) < 1:
+                status = old_status
+                msg = random_nlg('config_change_failed', {'item_change': cl + '色'}) + constraints_in_native(status)
+            else:
+                msg = random_nlg('color_assign', {'color': cl})
         # portable
         elif act == 'portable':
             status['weight'] = ['lte', 1.5]
@@ -222,6 +240,12 @@ def query(request):
             status['price_pos'] = 0.75
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '高端'})
+        elif act == 'rollback':
+            if 'last_status' in status:
+                status = status['last_status']
+                msg = random_nlg('rollback', {})
+            else:
+                msg = random_nlg('dont_know', {})
         
         if status.get('last_products'):
             # price
@@ -292,15 +316,15 @@ def query(request):
             if act == 'ask_performance_all':
                 msg = perfs.cpu(status['last_products'][0]) + perfs.gpu(status['last_products'][0])
 
-    if status['config_exist'] == False:
+    if status['config_exist'] == False and act != 'rollback':
         msg = random_nlg('ask_purpose', {})
 
     all = search_once(status)
     all.sort(key=lambda p: props.price(p))
     n = len(all)
     v = [all[int(n * status['price_pos'])]]
-    # friendly_display(v)
     status['last_products'] = v
+    status['last_status'] = last_status
     data = {'error': 0,
             'msg': {
                 'products': v,
