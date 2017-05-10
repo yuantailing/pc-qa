@@ -113,3 +113,23 @@ def seller_num(product):
     s = product['seller_num'][0]
     if re.match('^(\d+)商家在售$', s): return int(re.match('^(\d+)商家在售$', s).group(1))
     return None
+
+_matched_colors = [('^(?:白|珍珠白|象牙白)', '白'), ('^(?:黑|深黑|矿物黑|超炫黑)', '黑'), ('^(?:银|皓月银|魔幻银)', '银'), ('^(?:金|香槟金)', '金'), ('^(?:灰|深灰|深空灰)', '灰'),
+    ('^红', '红'), ('绿', '绿'), ('黄|古铜', '黄'), ('蓝', '蓝'), ('橙', '橙'), ('粉', '粉'), ('紫', '紫'), ('棕', '棕'),
+    ('红', '红'), ('银', '银'), ('灰', '灰'), ('白', '白'), ('黑|拥有“龙”', '黑'), ('金', '金'), ('彩', '彩')]
+_matched_colors = [(re.compile(t[0]), t[1]) for t in _matched_colors]
+def color(product):
+    s = product['外壳描述'][0].split('/')
+    s = [c.split('，') for c in s]
+    s = reduce(lambda a, b: a + b, s)
+    res = []
+    found = False
+    for t in s:
+        for c in _matched_colors:
+            if c[0].search(t):
+                res.append(c[1])
+                found = True
+                break
+    if not found:
+        assert False
+    return res
