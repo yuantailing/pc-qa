@@ -32,6 +32,52 @@ def random_nlg(act_type, kw):
     assert(0 < len(all))
     return random.sample(all, 1)[0]['output']
 
+def constraints_in_native(status):
+    def native_brand(v):
+        v.sort(key=lambda b: (b == 'others', b))
+        d = {
+            'thinkpad': 'ThinkPad',
+            'apple': '苹果',
+            'ms': '微软',
+            'lenovo': '联想',
+            'dell': '戴尔',
+            'hasee': '神舟',
+            'alien': '外星人',
+            'samsung': '三星',
+            'hp': '惠普',
+            'asus': '华硕',
+            'acer': '宏碁',
+            }
+        return [d[s] for s in v]
+    res = []
+    if status['brand']['in']:
+        res.append('品牌只要{0}'.format('、'.join(native_brand(status['brand']['in']))))
+    elif status['brand']['not']:
+        res.append('品牌不要{0}'.format('、'.join(native_brand(status['brand']['not']))))
+    prop_limits = [
+        ('price', '价格{0}{1}元'),
+        ('cpu', 'CPU{0}{1}GHz'),
+        ('memory', '内存{0}{1}GB'),
+        ('disk', '硬盘{0}{1}GB'),
+        ('gpu', 'GPU{0} GTX 9{1}0'),
+        ('screen', '屏幕{0}{1}寸'),
+        ('market_date', '上市时间{0}{1}'),
+    ]
+    for p in prop_limits:
+        rng = status[p[0]]
+        if rng[0] is None: continue
+        elif rng[0] == 'gt': s0 = '大于'
+        elif rng[0] == 'lt': s0 = '小于'
+        elif rng[0] == 'gte': s0 = '不小于'
+        elif rng[0] == 'lte': s0 = '不大于'
+        elif rng[0] == 'eq': s0 = '是'
+        else: assert False, rng
+        res.append(p[1].format(s0, rng[1]))
+    if status['weight'][0] is not None:
+        assert status['weight'] == ['lte', 1.5]
+        res.append('便携（小于1.5Kg）')
+    return '，'.join(res)
+
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
