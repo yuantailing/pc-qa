@@ -123,49 +123,101 @@ function init() {
 }
         </script>
         <style>
-
+        .view {
+            margin-top: 2em;
+        }
+        #query-line {
+            position: fixed;
+            height: 80px;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+        }
+        #input-query {
+            width: 80%;
+        }
+        .template {
+        }
+        .computer-summary {
+        }
+        .message-show {
+            margin-top: 2em;
+        }
         </style>
     </head>
     <body>
         {% csrf_token %}
         <div class="container" align="center">
-            <div class="view" style="height: 600px; overflow: auto;"></div>
-            <div>
-                <input id="input-query" style="width: 600px;"/>
-                <button id="button-query">Submit</button>
-                <button id="button-tips">Tips</button>
+            <div class="view">
+                <div>
+                </div>
+            </div>
+            <div id="query-line" class="form-inline">
+                <input id="input-query" class="form-control" placeholder="您还有什么要求吗？"/>
+                <button id="button-query" class="btn btn-default">Submit</button>
+                <!-- <button id="button-tips" class="btn btn-default">Tips</button> -->
             </div>
         </div>
         <div class="templates" hidden>
+            <div>
+                
+            </div>
             <div class="computer-summary">
-                <div class="col-sm-12">
-                    <div class="row">
-                        <div class="col-sm-2">
-                            <img id="image" style="width: 80%"/>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img id="image" class="img-rounded" style="width: 80%"/>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row"><h3><a id="title" target="_blank">名称</a></h3></div>
+                        <div class="row" style="color: red"><h3><span id="price">价格</span> 元</h3></div>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h4>配置参数</h4>
+                    </div>
+                    <div class="col-sm-9">
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3"><b>CPU</b></div>
+                            <div class="col-sm-3" id="cpu"></div>
                         </div>
-                        <div class="col-sm-10">
-                            <div class="row">
-                                <div class="col-sm-9"><a id="title" target="_blank">名称</a></div>
-                                <div class="col-sm-3" style="color: red"><span id="price">价格</span> 元</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-3" id="cpu">CPU</div>
-                                <div class="col-sm-3" id="memory">内存</div>
-                                <div class="col-sm-3" id="disk">硬盘</div>
-                                <div class="col-sm-3" id="screen">屏幕</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-3" id="cpu_freq">CPU频率</div>
-                                <div class="col-sm-3"><span id="gpu"></span> (<span id="gpu_size"></span>)</div>
-                                <div class="col-sm-3" id="market_time">上市时间</div>
-                                <div class="col-sm-3" id="weight">重量</div>
-                            </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>CPU频率</b></div>
+                            <div class="col-sm-3" id="cpu_freq"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>内存</b></div>
+                            <div class="col-sm-3" id="memory"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>硬盘</b></div>
+                            <div class="col-sm-3" id="disk"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>屏幕</b></div>
+                            <div class="col-sm-3" id="screen"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>GPU</b></div>
+                            <div class="col-sm-3"><span id="gpu"></span> (<span id="gpu_size"></span>)</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>上市时间</b></div>
+                            <div class="col-sm-3" id="market_time"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>重量</b></div>
+                            <div class="col-sm-3" id="weight"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="message-show">
-                <p id="content"></p>
+                <h2 id="content"></h2>
             </div>
             <div class="debug-show" align="left">
             </div>
