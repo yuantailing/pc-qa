@@ -60,13 +60,13 @@ function init() {
                 wrapper.addClass('view-query');
                 $.map(data.msg.products, function(p) {
                     var div = $('.templates .computer-summary').clone();
-                    div.find('#image').attr('src', p['img']);
+                    div.find('#image').attr('src', p['img'].replace('_80x60', '_280x210'));
                     div.find('#title').text(p['型号']);
                     div.find('#title').attr('href', p['link']);
                     div.find('#price').text(p['price']);
-                    div.find('#cpu').text(p['CPU型号']);
+                    div.find('#cpu').text(p['CPU型号'] + ' @' + p['CPU主频']);
                     div.find('#memory').text(p['内存容量']);
-                    div.find('#disk').text(p['硬盘容量']);
+                    div.find('#disk').text(p['硬盘容量'] + ' ' + p['硬盘描述']);
                     div.find('#screen').text(p['屏幕尺寸']);
                     div.find('#cpu_freq').text(p['CPU主频']);
                     div.find('#gpu').text(p['显卡芯片']);
@@ -184,10 +184,6 @@ function init() {
                         <div class="row">
                             <div class="col-sm-3"><b>CPU</b></div>
                             <div class="col-sm-3" id="cpu"></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-3"><b>CPU频率</b></div>
-                            <div class="col-sm-3" id="cpu_freq"></div>
                         </div>
                         <div class="row">
                             <div class="col-sm-3"><b>内存</b></div>
