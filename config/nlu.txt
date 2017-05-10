@@ -1,14 +1,14 @@
-property.*(?:大|高|太?强|太?好|太?贵)了	property_dec	12
-property.*(?:小|低|太?弱|太?差|太?便宜)了	property_inc	12
-property.*(?:大|高|强|好|贵)	property_inc	11
-property.*(?:小|低|若|差|便宜)	property_dec	11
+property.*(?:大|高|太?强|太?好|太?贵)了	property_dec	14
+property.*(?:小|低|太?弱|太?差|太?便宜)了	property_inc	14
+property.*(?:大|高|强|好|贵)	property_inc	13
+property.*(?:小|低|若|差|便宜)	property_dec	13
 
 property.*太好了	property_dec	10
 property.*不够	property_inc	10
 property.*浪费	property_dec	9
 property.*跟不上	property_inc	9
 
-贵了|太贵|不便宜	price_dec	10
+贵了|太贵|不便宜|(?:价格|价钱)要?低	price_dec	10
 便宜|(?:不要|别)这么贵	price_dec	9
 预算.*?\d+	price_limit	10
 (?:不|别).{0,1}(?:超过|高于|大于)(?P<price_str>\d{4,})	price_limit	10
@@ -44,6 +44,10 @@ performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
 (?:上|前)一?(?:个|台|电脑)	rollback	10
 (?:刚才|刚刚)(?:的|那个|看的)	rollback	10
+(?:还|仍然).*(?:大|高|太?强|太?好|太?贵)了	more_dec	12
+(?:还|仍然).*(?:小|低|太?弱|太?差|太?便宜)了	more_inc	12
+再.*(?:大|高|强|好|贵)	more_inc	11
+再.*(?:小|低|若|差|便宜)	more_dec	11
 
 ^\s*$	no_input	1
 (?:你|您)好	hi	1

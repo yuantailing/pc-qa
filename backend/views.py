@@ -142,11 +142,13 @@ def query(request):
     assert(result['error'] == 0)
     patternlist = result['msg']['patternlist']
     last_status = copy.deepcopy(status)
+    last_config_property = None
     if 0 != len(patternlist):
         patternlist.sort(key=lambda d: (-d['_level'], -d['_matched_length']))
         pattern = patternlist[0]
         old_status = copy.deepcopy(status)
         act = pattern['_act_type']
+        got_last_config_property = None
         msg = '无逻辑匹配 _act_type={0}'.format(act)
         # brand
         if act == 'brand_no':
@@ -240,8 +242,22 @@ def query(request):
             status['price_pos'] = 0.75
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '高端'})
+        elif act == 'more_inc':
+            if status.get('last_config_property') in constraints_adjust_settings:
+                act = 'property_inc'
+                got_last_config_property = status.get('last_config_property')
+            else:
+                msg = random_nlg('dont_know', {})
+        elif act == 'more_dec':
+            if status.get('last_config_property') in constraints_adjust_settings:
+                act = 'property_dec'
+                got_last_config_property = status.get('last_config_property')
+            elif status.get('last_config_property') == 'price':
+                act = 'price_dec'
+            else:
+                msg = random_nlg('dont_know', {})
         elif act == 'rollback':
-            if 'last_status' in status:
+            if status.get('last_status'):
                 status = status['last_status']
                 msg = random_nlg('rollback', {})
             else:
@@ -250,6 +266,7 @@ def query(request):
         if status.get('last_products'):
             # price
             if act == 'price_dec':
+                last_config_property = 'price'
                 status['price'] = ['lte', props.price(status['last_products'][0]) - 1]
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
@@ -272,7 +289,8 @@ def query(request):
                 'screen': ('screen', props.screen_size, ('屏幕更大', ), ('屏幕更小', )),
             }
             if act in ('property_inc', 'property_dec'):
-                property = pattern['_regular']['property'][0]
+                property = got_last_config_property or pattern['_regular']['property'][0]
+                last_config_property = property
                 statuskey, propfn, incnlgparam, decnlgparam = constraints_adjust_settings[property]
                 if act.endswith('inc'):
                     direction, pricepos, nlgparam = 'gt', 0.2, incnlgparam
@@ -307,6 +325,7 @@ def query(request):
     v = [all[int(n * status['price_pos'])]]
     status['last_products'] = v
     status['last_status'] = last_status
+    status['last_config_property'] = last_config_property
     data = {'error': 0,
             'msg': {
                 'products': v,
