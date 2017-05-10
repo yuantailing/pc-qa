@@ -87,6 +87,7 @@ def query(request):
     else:
         status = {
                 'brand': {'in': None, 'not': []},
+                'color': {'in': None, 'not': []},
                 'cpu': [None],
                 'memory': [None],
                 'disk': [None],
@@ -95,7 +96,6 @@ def query(request):
                 'weight': [None],
                 'market_date': [None],
                 'price': [None],
-                'seller': [None],
                 'price_pos': 0.5,
                 'config_exist': False,
                 }
@@ -103,7 +103,13 @@ def query(request):
         if type(rng) is not type(dict()) and rng[0] is None:
             return True
         prop = func(product)
-        if type(rng) is type(dict()): return prop not in rng['not'] and (rng['in'] is None or prop in rng['in'])
+        if type(rng) is type(dict()):
+            if type(prop) is type(list()):
+                for p in prop:
+                    if p not in rng['not'] and (rng['in'] is None or p in rng['in']):
+                        return True
+                return False
+            return prop not in rng['not'] and (rng['in'] is None or prop in rng['in'])
         if rng[0] == 'gt': return prop is not None and prop > rng[1]
         if rng[0] == 'lt': return prop is not None and prop < rng[1]
         if rng[0] == 'gte': return prop is not None and prop >= rng[1]
@@ -116,6 +122,7 @@ def query(request):
             for p in s['products']:
                 if props.is_ill(p): continue
                 if not check_between(p, props.brand, status['brand']): continue
+                if not check_between(p, props.color, status['color']): continue
                 if not check_between(p, props.cpu_freq, status['cpu']): continue
                 if not check_between(p, props.memory_size, status['memory']): continue
                 if not check_between(p, props.disk_size, status['disk']): continue
@@ -124,7 +131,6 @@ def query(request):
                 if not check_between(p, props.weight, status['weight']): continue
                 if not check_between(p, props.market_date, status['market_date']): continue
                 if not check_between(p, props.price, status['price']): continue
-                if not check_between(p, props.seller_num, status['seller']): continue
                 all.append(p)
         return all
     text = request.POST.get('text')
@@ -142,6 +148,7 @@ def query(request):
         # brand
         if act == 'brand_no':
             bd = pattern['brand'][0]
+            status['config_exist'] = True
             regular_bd = pattern['_regular']['brand'][0]
             if status['brand']['in'] is not None and regular_bd in status['brand']['in']:
                 status['brand']['in'].remove(regular_bd)
@@ -152,11 +159,36 @@ def query(request):
             msg = random_nlg('brand_no', {'brand': bd})
         elif act == 'brand_assign':
             bd = pattern['brand'][0]
+            status['config_exist'] = True
             regular_bd = pattern['_regular']['brand'][0]
             status['brand']['in'] = [regular_bd]
             if regular_bd in status['brand']['not']:
                 status['brand']['not'].remove(regular_bd)
             msg = random_nlg('brand_assign', {'brand': bd})
+        # color
+        elif act == 'to_ask_color':
+            status['config_exist'] = True
+            msg = random_nlg('to_ask_color', {})
+        elif act == 'color_no':
+            cl = pattern['color'][0]
+            status['config_exist'] = True
+            regular_cl = pattern['_regular']['color'][0]
+            if status['color']['in'] is not None and regular_cl in status['color']['in']:
+                status['color']['in'].remove(regular_cl)
+            if status['color']['in'] is not None and 0 == len(status['color']['in']):
+                status['color']['in'] = None
+            if regular_cl not in status['color']['not']:
+                status['color']['not'].append(regular_cl)
+            msg = random_nlg('color_no', {'color': cl})
+        elif act == 'color_assign':
+            cl = pattern['color'][0]
+            status['config_exist'] = True
+            regular_cl = pattern['_regular']['color'][0]
+            status['color']['in'] = [regular_cl]
+            if regular_cl in status['color']['not']:
+                status['color']['not'].remove(regular_cl)
+            friendly_display(status['color'])
+            msg = random_nlg('color_assign', {'color': cl})
         # portable
         elif act == 'portable':
             status['weight'] = ['lte', 1.5]
@@ -190,10 +222,8 @@ def query(request):
                     msg = random_nlg('price_dec_failed', {})
                 else:
                     msg = random_nlg('price_dec', {})
-            elif act == 'ask_battery_life':
-                msg = random_nlg('battery_life', {'text': props.battery_life_text(status['last_products'][0])})
-            elif act == 'ask_guarantee':
-                msg = random_nlg('guarantee', {'text': props.guarantee(status['last_products'][0])})
+            elif act == 'ask_color':
+                msg = random_nlg('ask_color', {'colors': '色、'.join(props.color(status['last_products'][0])) + '色'})
             # without config
             elif act =='recommend_without_config':
                 msg = random_nlg('ask_purpose', {})

@@ -14,12 +14,18 @@ property.*跟不上	property_inc	9
 不(?:要|喜欢|想要).*brand	brand_no	10
 (?:要|喜欢|想要).*brand	brand_assign	9
 
+不(?:要|喜欢|想要).*color	color_no	10
+(?:要|喜欢|想要).*color	color_assign	9
+color色	color_assign	9
+
 performance	ask_performance	9
 performance(?:如何|怎么样|吗|呢)	ask_performance	10
 performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
 不卡	ask_performance_all	9
-好看|漂亮|美观|时尚|时髦	ask_color	9
+
+好看|漂亮|美观|时尚|时髦	to_ask_color	9
+什么颜色	ask_color	10
 
 (?:要|想要|买|想买|推荐)	recommend_without_config	8
 (?:入门|办公|斗地主|网页|看电影|听歌)	low_demand	8
