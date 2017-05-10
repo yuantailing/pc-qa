@@ -76,7 +76,7 @@ def constraints_in_native(status):
     if status['weight'][0] is not None:
         assert status['weight'] == ['lte', 1.5]
         res.append('便携（小于1.5Kg）')
-    return '，'.join(res)
+    return '。您的选项是：' + '，'.join(res)
 
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -136,7 +136,7 @@ def query(request):
                 all.append(p)
         return all
     text = request.POST.get('text')
-    msg = '无模板匹配'
+    msg = random_nlg('dont_know', {})
     result = api.nlu(text)
     friendly_display(result)
     assert(result['error'] == 0)
@@ -197,7 +197,7 @@ def query(request):
             status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('protable_failed', {})
+                msg = random_nlg('protable_failed', {}) + constraints_in_native(status)
             else:
                 msg = random_nlg('portable', {})
         # long battery life
@@ -206,7 +206,7 @@ def query(request):
             status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('long_battery_life_failed', {})
+                msg = random_nlg('long_battery_life_failed', {}) + constraints_in_native(status)
             else:
                 msg = random_nlg('long_battery_life', {})
         # application
@@ -230,7 +230,7 @@ def query(request):
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
                     status = old_status
-                    msg = random_nlg('price_dec_failed', {})
+                    msg = random_nlg('price_dec_failed', {}) + constraints_in_native(status)
                 else:
                     msg = random_nlg('price_dec', {})
             elif act == 'ask_color':
@@ -259,7 +259,7 @@ def query(request):
                 status['config_exist'] = True
                 if len(search_once(status)) < 1:
                     status = old_status
-                    msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]})
+                    msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]}) + constraints_in_native(status)
                 else:
                     msg = random_nlg('config_change', {'item_change': nlgparam[0]})
 

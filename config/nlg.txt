@@ -21,3 +21,6 @@ long_battery_life_failed	当前条件下没有续航时间长的电脑了
 
 config_change	好的，为您推荐<item_change>的电脑
 config_change_failed	对不起，当前配置下没有<item_change>的电脑了
+
+dont_know	对不起，能换个说法吗
+dont_know	我没有理解，能换个说法吗

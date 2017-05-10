@@ -72,6 +72,7 @@ function init() {
                     div.find('#gpu').text(p['显卡芯片']);
                     div.find('#gpu_size').text(p['显存容量']);
                     div.find('#market_time').text(p['上市时间']);
+                    div.find('#color').text(p['外壳材质'] + ' ' + p['外壳描述']);
                     div.find('#weight').text(p['笔记本重量']);
                     wrapper.append(div);
                 });
@@ -204,6 +205,10 @@ function init() {
                         <div class="row">
                             <div class="col-sm-3"><b>上市时间</b></div>
                             <div class="col-sm-3" id="market_time"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"><b>外壳颜色</b></div>
+                            <div class="col-sm-3" id="color"></div>
                         </div>
                         <div class="row">
                             <div class="col-sm-3"><b>重量</b></div>
