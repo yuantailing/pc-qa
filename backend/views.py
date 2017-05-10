@@ -346,7 +346,7 @@ def query(request):
     n = len(all)
     v = [all[int(n * status['price_pos'])]]
     status['last_products'] = v
-    status['last_status'] = last_status
+    status['last_status'] = last_status['last_status'] if last_status.get('last_products') and last_status.get('last_products') and last_status['last_products'][0]['型号'] == v[0]['型号'] else last_status
     status['last_config_property'] = last_config_property
     data = {'error': 0,
             'msg': {
