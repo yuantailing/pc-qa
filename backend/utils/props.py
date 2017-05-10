@@ -123,13 +123,18 @@ def color(product):
     s = [c.split('，') for c in s]
     s = reduce(lambda a, b: a + b, s)
     res = []
-    found = False
     for t in s:
         for c in _matched_colors:
             if c[0].search(t):
                 res.append(c[1])
-                found = True
                 break
-    if not found:
-        assert False
+    assert res
     return res
+
+def guarantee(product):
+    if not product['质保时间']:
+        return '没有质保相关信息'
+    msg = product['质保时间'][0]
+    if product['质保备注']:
+        msg += '：' + product['质保备注'][0]
+    return msg

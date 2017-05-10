@@ -142,8 +142,9 @@ def query(request):
                 msg = random_nlg('price_dec_failed', {})
             else:
                 msg = random_nlg('price_dec', {})
-        elif act == 'ask_performance':
-            msg = perfs.cpu(status['last_products'][0])
+        elif act == 'ask_guarantee':
+            if status['last_products']:
+                msg = random_nlg('guarantee', {'text': props.guarantee(status['last_products'][0])})
         # without config
         elif act =='recommend_without_config':
             msg = random_nlg('ask_purpose', {})
@@ -190,7 +191,7 @@ def query(request):
     all.sort(key=lambda p: props.price(p))
     n = len(all)
     v = [all[int(n * status['price_pos'])]]
-    # friendly_display(v)
+    friendly_display(v)
     status['last_products'] = v
     data = {'error': 0,
             'msg': {

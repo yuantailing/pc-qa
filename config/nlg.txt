@@ -14,3 +14,5 @@ protable_failed	当前条件下没有便携的电脑
 
 config_change	好的，为您推荐<item_change>的电脑
 config_change_failed	对不起，当前配置下没有<item_change>的电脑了
+
+guarantee	当前产品的质保时间是<text>
