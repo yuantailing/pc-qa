@@ -14,7 +14,6 @@ import os
 import random
 import re
 from .utils import perfs, props
-from functools import reduce
 
 # Create your views here.
 
