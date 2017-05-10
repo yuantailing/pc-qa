@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import localqa
 import os
 import random
+from . import props
 
 api = localqa.api.Api(os.path.join(os.path.dirname(__file__), 'config'))
 

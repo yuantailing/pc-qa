@@ -148,21 +148,22 @@ def query(request):
         elif act =='recommend_without_config':
             msg = random_nlg('ask_purpose', {})
 
-        constraints_adjust_settings = [
-            # (NLU里的关键词  status里的键  props里的函数  (inc成功NLG参数  失败NLG参数), (dec成功NLG参数  失败NLG参数))
-            ('cpu', 'cpu', props.cpu_freq, ('cpu更好', ), ('cpu稍弱', )),
-            ('memory', 'memory', props.memory_size, ('内存更大', ), ('内存稍小', )),
-            ('disk', 'disk', props.disk_size, ('硬盘更大', ), ('硬盘更小', )),
-            ('gpu', 'gpu', props.gpu_rank, ('gpu更好', ), ('gpu稍弱', )),
-        ]
-        for t in constraints_adjust_settings:
-            nlukey, statuskey, propfn, incnlgparam, decnlgparam = t
-            direction = None
-            if act == '{0}_inc'.format(nlukey):
+        constraints_adjust_settings = {
+            # NLU里的关键词:  (status里的键  props里的函数  (inc成功NLG参数  失败NLG参数), (dec成功NLG参数  失败NLG参数))
+            'cpu': ('cpu', props.cpu_freq, ('cpu更好', ), ('cpu稍弱', )),
+            'memory': ('memory', props.memory_size, ('内存更大', ), ('内存稍小', )),
+            'disk': ('disk', props.disk_size, ('硬盘更大', ), ('硬盘更小', )),
+            'gpu': ('gpu', props.gpu_rank, ('gpu更好', ), ('gpu稍弱', )),
+            'screen': ('screen', props.screen_size, ('屏幕更大', ), ('屏幕更小', )),
+        }
+        if act in ('property_inc', 'property_dec'):
+            property = pattern['_regular']['property'][0]
+            statuskey, propfn, incnlgparam, decnlgparam = constraints_adjust_settings[property]
+            if act.endswith('inc'):
                 direction, pricepos, nlgparam = 'gt', 0.2, incnlgparam
-            elif act == '{0}_dec'.format(nlukey):
+            else:
                 direction, pricepos, nlgparam = 'lt', 0.8, decnlgparam
-            if direction is not None:
+            if status['last_products']:
                 status[statuskey] = [direction, propfn(status['last_products'][0])]
                 status['price_pos'] = pricepos
                 status['config_exist'] = True
@@ -171,6 +172,16 @@ def query(request):
                     msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]})
                 else:
                     msg = random_nlg('config_change', {'item_change': nlgparam[0]})
+
+        ask_performance = {
+            'cpu': (perfs.cpu, ),
+            'gpu': (perfs.gpu, ),
+        }
+        if act == 'ask_performance':
+            performance = pattern['_regular']['performance'][0]
+            perffn = ask_performance[performance][0]
+            if status['last_products']:
+                msg = perffn(status['last_products'][0])
 
     if status['config_exist'] == False:
         msg = random_nlg('ask_purpose', {})
