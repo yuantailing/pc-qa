@@ -15,9 +15,13 @@ property.*跟不上	property_inc	9
 (?:要|喜欢|想要).*brand	brand_assign	9
 
 performance(?:如何|怎么样)	ask_performance	10
-performance够用(?:吗|么)	ask_performance	10
+performance够用(?:吗|么|？|\?)	ask_performance	10
 
-^\s*$	no_input	1
+不卡	ask_performance_all	9
+保修	ask_guarantee	10
+续航(?:多久)	ask_battery_life	9
+续航.*(长|久)	long_battery_life	10
+好看|漂亮|美观|时尚|时髦	ask_color	9
 
 (?:要|想要|买|想买|推荐)	recommend_without_config	8
 (?:入门|办公|斗地主|网页|看电影|听歌)	low_demand	8
@@ -25,8 +29,9 @@ performance够用(?:吗|么)	ask_performance	10
 (?:高端|单机游戏|跳伞|设计|画图|渲染|建模)	high_demand	10
 (?:高)性能(?:强)	high_demand	10
 
-(?:便携|重|轻)	portable	9
+(?:便携|重|轻|薄|厚)	portable	9
 
+^\s*$	no_input	1
 (?:你|您)好	hi	1
 (?:谢谢|感谢)+(?:你)?	thx	10
 再见	bye	10
