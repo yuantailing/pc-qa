@@ -54,9 +54,10 @@ def query(request):
                 'config_exist': False,
                 }
     def check_between(product, func, rng):
-        if rng[0] is None:
+        if type(rng) is not type(dict()) and rng[0] is None:
             return True
         prop = func(product)
+        if type(rng) is type(dict()): return prop not in rng['not'] and (rng['in'] is None or prop in rng['in'])
         if rng[0] == 'gt': return prop is not None and prop > rng[1]
         if rng[0] == 'lt': return prop is not None and prop < rng[1]
         if rng[0] == 'gte': return prop is not None and prop >= rng[1]
@@ -68,8 +69,7 @@ def query(request):
         for s in series:
             for p in s['products']:
                 if props.is_ill(p): continue
-                if status['brand']['in'] is not None and props.brand(p) not in status['brand']['in']: continue
-                if props.brand(p) in status['brand']['not']: continue
+                if not check_between(p, props.brand, status['brand']): continue
                 if not check_between(p, props.cpu_freq, status['cpu']): continue
                 if not check_between(p, props.memory_size, status['memory']): continue
                 if not check_between(p, props.disk_size, status['disk']): continue
