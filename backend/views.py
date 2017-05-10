@@ -140,6 +140,7 @@ def query(request):
     result = api.nlu(text)
     friendly_display(result)
     assert(result['error'] == 0)
+    act = None
     patternlist = result['msg']['patternlist']
     last_status = copy.deepcopy(status)
     last_config_property = None
@@ -243,13 +244,13 @@ def query(request):
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '高端'})
         elif act == 'more_inc':
-            if status.get('last_config_property') in constraints_adjust_settings:
+            if status.get('last_config_property') in ('cpu', 'memory', 'disk', 'gpu', 'screen'):
                 act = 'property_inc'
                 got_last_config_property = status.get('last_config_property')
             else:
                 msg = random_nlg('dont_know', {})
         elif act == 'more_dec':
-            if status.get('last_config_property') in constraints_adjust_settings:
+            if status.get('last_config_property') in ('cpu', 'memory', 'disk', 'gpu', 'screen'):
                 act = 'property_dec'
                 got_last_config_property = status.get('last_config_property')
             elif status.get('last_config_property') == 'price':
@@ -267,6 +268,7 @@ def query(request):
             # price
             if act == 'price_dec':
                 last_config_property = 'price'
+                status['config_exist'] = True
                 status['price'] = ['lte', props.price(status['last_products'][0]) - 1]
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
@@ -274,7 +276,23 @@ def query(request):
                     msg = random_nlg('price_dec_failed', {}) + constraints_in_native(status)
                 else:
                     msg = random_nlg('price_dec', {})
+            elif act == 'price_limit':
+                status['config_exist'] = True
+                status['price'] = ['lte', int(pattern['price_str'][0])]
+                status['price_pos'] = 0.8
+                if len(search_once(status)) < 1:
+                    status = old_status
+                    msg = random_nlg('price_limit_failed', {'price': pattern['price_str'][0]}) + constraints_in_native(status)
+                else:
+                    msg = random_nlg('price_limit', {'price': pattern['price_str'][0]})
+            elif act == 'price_limit_cancle':
+                status['config_exist'] = True
+                status['price'] = [None]
+                status['price_pos'] = 0.5
+                msg = random_nlg('price_limit_cancle', {})
+            # ask color
             elif act == 'ask_color':
+                status['config_exist'] = True
                 msg = random_nlg('ask_color', {'colors': '色、'.join(props.color(status['last_products'][0])) + '色'})
             # without config
             elif act =='recommend_without_config':
@@ -312,9 +330,13 @@ def query(request):
                 'battery': (perfs.battery_life, ),
             }
             if act == 'ask_performance':
+                status['config_exist'] = True
                 performance = pattern['_regular']['performance'][0]
                 perffn = ask_performance[performance][0]
                 msg = perffn(status['last_products'][0])
+            if act == 'ask_performance_all':
+                status['config_exist'] = True
+                msg = perfs.cpu(status['last_products'][0]) + perfs.gpu(status['last_products'][0])
 
     if status['config_exist'] == False and act != 'rollback':
         msg = random_nlg('ask_purpose', {})

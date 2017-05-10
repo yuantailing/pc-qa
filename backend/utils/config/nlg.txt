@@ -1,3 +1,6 @@
-perf_cpu_medium	<name> 是一款中端CPU，主频 <freq> 能满足你的日常办公需求，可以运行小型游戏
+perf_cpu_medium	<name> 是一款中低端CPU，主频 <freq> ，能满足你的日常办公、休闲娱乐需求。
+perf_cpu_high	<name> 是一款高端CPU，主频 <freq> ，能有效处理计算密集型任务。
+perf_gpu_medium	<name> 是一款中低端GPU，显存容量 <freq> ，可以承担日常视频播放，运行大多数游戏的任务。
+perf_gpu_high	<name> 是一款高端GPU，显存容量 <freq> ，能满足玩大型游戏、绘图、设计、渲染等需求。
 guarantee	当前产品的质保时间是<text>
 battery_life	当前产品的续航时间是<text>

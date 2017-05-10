@@ -82,7 +82,8 @@ function init() {
                 var div = $('.templates .debug-show').clone();
                 var debug_json = JSON.parse(backend_status);
                 delete debug_json.last_products;
-                div.JSONView(debug_json, { collapsed: false });
+                delete debug_json.last_status;
+                // div.JSONView(debug_json, { collapsed: false });
                 wrapper.append(div);
                 $('.view').empty().append(wrapper);
             },

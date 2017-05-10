@@ -27,3 +27,7 @@ rollback	好的，给您看刚才那台电脑
 
 dont_know	对不起，能换个说法吗
 dont_know	我没有理解，能换个说法吗
+
+price_limit_failed	对不起，当前条件下没有价格低于<price>的电脑了
+price_limit	好的，为您推荐<price>元以下的电脑
+price_limit_cancle	好的，已经取消了价格限制

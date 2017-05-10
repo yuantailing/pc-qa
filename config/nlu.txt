@@ -10,11 +10,11 @@ property.*跟不上	property_inc	9
 
 贵了|太贵|不便宜|(?:价格|价钱)要?低	price_dec	10
 便宜|(?:不要|别)这么贵	price_dec	9
-预算.*?\d+	price_limit	10
+预算.*?(?P<price_str>\d{4,})	price_limit	10
 (?:不|别).{0,1}(?:超过|高于|大于)(?P<price_str>\d{4,})	price_limit	10
 (?:价格|价钱)(?:低于|小于|限制|限制在)(?P<price_str>\d{4,})	price_limit	10
 (?:价格|价钱)(?:随便|可以高)	price_limit_cancle	10
-价格.*没关系	price_limit_cancle	10
+价格.*(?:没关系|无所谓)	price_limit_cancle	10
 可以贵|取消价格限制|不限制?价格	price_limit_cancle	10
 
 不(?:要|喜欢|想要).*brand	brand_no	10
@@ -24,18 +24,19 @@ property.*跟不上	property_inc	9
 (?:要|喜欢|想要).*color	color_assign	9
 color色	color_assign	9
 
-performance	ask_performance	9
-performance(?:如何|怎么样|吗|呢)	ask_performance	10
+performance	ask_performance	8
+performance(?:如何|怎么样|怎样|吗|呢)	ask_performance	10
 performance够用(?:吗|么|呢|？|\?)	ask_performance	10
 
-不卡	ask_performance_all	9
+卡吗|不卡吗|卡不卡|会卡吗	ask_performance_all	9
+(?:性能|配置)(?:如何|怎么样|怎样|吗|呢)	ask_performance_all	10
 
 好看|漂亮|美观|时尚|时髦	to_ask_color	9
 什么颜色	ask_color	10
 
 (?:要|想要|买|想买|推荐)	recommend_without_config	8
-(?:入门|办公|斗地主|网页|看电影|听歌)	low_demand	8
-(?:大众|一般|普通|英雄联盟|LOL|lol|DOTA|Dota|dota|炉石|编程|游戏)	medium_demand	9
+(?:入门|办公|斗地主|网页|看电影|听歌|打牌|消遣)	low_demand	8
+(?:大众|一般|普通|英雄联盟|LOL|lol|DOTA|Dota|dota|炉石|编程|游戏|玩)	medium_demand	9
 (?:高端|单机游戏|跳伞|设计|画图|渲染|建模|绘图)	high_demand	10
 (?:高)性能(?:强)	high_demand	10
 

@@ -17,10 +17,18 @@ def random_nlg(act_type, kw):
     return random.sample(all, 1)[0]['output']
 
 def cpu(product):
-    return random_nlg('perf_cpu_medium', {'name': product['CPU型号'][0], 'freq': product['CPU主频'][0]})
+    item = {'name': product['CPU型号'][0], 'freq': product['CPU主频'][0]}
+    if props.cpu_freq(product) > 2.5:
+        return random_nlg('perf_cpu_high', item)
+    else:
+        return random_nlg('perf_cpu_medium', item)
 
 def gpu(product):
-    return random_nlg('perf_gpu_medium', {'name': product['显卡芯片'][0], 'freq': product['显存容量'][0]})
+    item = {'name': product['显卡芯片'][0], 'freq': product['显存容量'][0]}
+    if props.gpu_rank(product) > 5:
+        return random_nlg('perf_gpu_high', item)
+    else:
+        return random_nlg('perf_gpu_medium', item)
 
 def guarantee(product):
     msg = ''
