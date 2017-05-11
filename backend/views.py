@@ -245,7 +245,7 @@ def query(request):
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '入门'})
         elif act == 'medium_demand':
-            status['price_pos'] = 0.5
+            status['price_pos'] = 0.51
             status['config_exist'] = True
             msg = random_nlg('demand_level', {'level': '大众'})
         elif act == 'high_demand':
@@ -281,6 +281,7 @@ def query(request):
             if num == int(num): num = int(num)
             if prop in ('memory', 'disk'):
                 status[prop] = [direction, num * 1000 if unit_str == 'T' else num]
+                status['price_pos'] = 0.5
                 translated_direction = {'gte': '至少', 'lte': '至多', 'eq': ''}[direction]
                 translated_prop = {'memory': '内存', 'disk': '硬盘'}[prop]
                 if len(search_once(status)) < 1:
