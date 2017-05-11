@@ -50,6 +50,9 @@ performance(?:够用|行|可以)(?:吗|么|呢|？|\?)	ask_performance	10
 (?:便携|重|轻|薄|厚)	portable	9
 续航.*(?:长|久)	long_battery_life	11
 
+(?:不限制|无所谓).*status_key_can_reset	property_limit_cancle	10
+status_key_can_reset.*(?:可以|也可以)?.*(?:无所谓|算了)	property_limit_cancle	10
+
 (?:上|前)一?(?:个|台|电脑)	rollback	10
 (?:刚才|刚刚)(?:的|那个|看的)	rollback	10
 ^我?(?:不想?要了|算了|还是要)吧?$	rollback	10

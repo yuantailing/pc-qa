@@ -1,0 +1,8 @@
+(?:CPU|Cpu|cpu|处理器)	cpu
+(?:GPU|Gpu|gpu|显卡|显示卡|显视卡)	gpu
+(?:硬盘|磁盘)	disk
+(?:内存|RAM|Ram|ram|运存)	memory
+(?:屏幕|显示屏|显示器)	screen
+(?:电池|续航|续航时间)	battery_life
+(?:轻重|重量|便携|便携性)	weight
+(?:预算|价格|价钱)	price

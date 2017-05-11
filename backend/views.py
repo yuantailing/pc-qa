@@ -79,30 +79,36 @@ def constraints_in_native(status, skip):
         if status['weight'][0] is not None:
             assert status['weight'] == ['lte', 1.5]
             res.append('便携（小于1.5Kg）')
+    if 'battery_life' not in skip:
+        if status['battery_life'][0] is not None:
+            assert status['battery_life'] == ['gte', 5]
+            res.append('续航时间长（大于5小时）')
     return '。您的选项是：' + '，'.join(res) if res else ''
 
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
+empty_status = {
+    'brand': {'in': None, 'not': []},
+    'color': {'in': None, 'not': []},
+    'cpu': [None],
+    'memory': [None],
+    'disk': [None],
+    'gpu': [None],
+    'screen': [None],
+    'weight': [None],
+    'battery_life': [None],
+    'market_date': [None],
+    'price': [None],
+    'price_pos': 0.5,
+    'config_exist': False,
+}
+
 def query(request):
     if request.POST.get('status'):
         status = json.loads(request.POST.get('status'))
     else:
-        status = {
-                'brand': {'in': None, 'not': []},
-                'color': {'in': None, 'not': []},
-                'cpu': [None],
-                'memory': [None],
-                'disk': [None],
-                'gpu': [None],
-                'screen': [None],
-                'weight': [None],
-                'battery_life': [None],
-                'market_date': [None],
-                'price': [None],
-                'price_pos': 0.5,
-                'config_exist': False,
-                }
+        status = copy.deepcopy(empty_status)
     def check_between(product, func, rng):
         if type(rng) is not type(dict()) and rng[0] is None:
             return True
@@ -281,7 +287,17 @@ def query(request):
                     msg = random_nlg('config_change_failed', {'item_change': translated_prop + translated_direction + str(num) + unit_str}) + constraints_in_native(status, prop)
                 else:
                     msg = random_nlg('config_change', {'item_change': translated_prop + translated_direction + str(num) + unit_str})
-        
+        elif act == 'property_limit_cancle':
+            prop = pattern['_regular']['status_key_can_reset'][0]
+            namemap = {'cpu': 'CPU', 'gpu': '显卡', 'disk': '硬盘', 'memory': '内存', 'screen': '屏幕尺寸', 'battery_life': '续航时间', 'weight': '重量', 'price': '价格'}
+            if prop in namemap:
+                status[prop] = copy.deepcopy(empty_status[prop])
+                if len(search_once(status)) < 1:
+                    status = old_status
+                    msg = random_nlg('property_limit_cancle_failed', {}) + constraints_in_native(status, prop)
+                else:
+                    msg = random_nlg('property_limit_cancle', {'property': namemap[prop]})
+
         if status.get('last_products'):
             # price
             if act == 'price_dec':
