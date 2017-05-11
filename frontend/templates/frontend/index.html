@@ -41,13 +41,15 @@ function init() {
         }
     }).focus();
     $('#button-query').click(function() {
+        var text = $('#input-query')[0].value;
+        if (!text) return;
         $.ajax({
             url: api_query,
             method: 'POST',
             data: {
                 csrfmiddlewaretoken: $.cookie('csrftoken'),
                 status: backend_status,
-                text: $('#input-query')[0].value,
+                text: text,
             },
             success: function(data) {
                 if (data.error) {
@@ -152,6 +154,7 @@ function init() {
         <div class="container" align="center">
             <div class="view">
                 <div>
+                    <h3>请问您有什么需求？</h3>
                 </div>
             </div>
             <div id="query-line" class="form-inline">

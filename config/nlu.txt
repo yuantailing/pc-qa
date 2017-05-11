@@ -23,7 +23,7 @@ property.*跟不上	property_inc	9
 
 不(?:要|喜欢|想要).*color	color_no	10
 (?:要|喜欢|想要).*color	color_assign	9
-color色	color_assign	9
+color(?:的|色)	color_assign	9
 
 performance	ask_performance	8
 performance(?:如何|怎么样|怎样|吗|呢)	ask_performance	10
@@ -35,11 +35,11 @@ performance(?:够用|行|可以)(?:吗|么|呢|？|\?)	ask_performance	10
 好看|漂亮|美观|时尚|时髦	to_ask_color	9
 什么颜色	ask_color	10
 
-(?:要|想要|买|想买|推荐)	recommend_without_config	8
-(?:入门|办公|斗地主|网页|看电影|听歌|打牌|消遣)	low_demand	8
-(?:大众|一般|普通|英雄联盟|LOL|lol|DOTA|Dota|dota|炉石|编程|游戏|玩)	medium_demand	9
-(?:高端|单机游戏|跳伞|设计|画图|渲染|建模|绘图)	high_demand	10
-(?:高)性能(?:强)	high_demand	10
+(?:要|想要|买|想买|推荐)	recommend_without_config	5
+(?:入门|办公|斗地主|网页|看电影|听歌|打牌|消遣)	low_demand	5
+(?:大众|一般|普通|英雄联盟|LOL|lol|DOTA|Dota|dota|炉石|编程|游戏|玩)	medium_demand	6
+(?:高端|单机游戏|跳伞|设计|画图|渲染|建模|绘图)	high_demand	7
+(?:高)性能(?:强)	high_demand	7
 
 (?:便携|重|轻|薄|厚)	portable	9
 续航.*(?:长|久)	long_battery_life	11
