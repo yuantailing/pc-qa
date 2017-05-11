@@ -72,7 +72,7 @@ def constraints_in_native(status, skip):
         elif rng[0] == 'lt': s0 = '小于'
         elif rng[0] == 'gte': s0 = '不小于'
         elif rng[0] == 'lte': s0 = '不大于'
-        elif rng[0] == 'eq': s0 = '是'
+        elif rng[0] == 'eq': s0 = ''
         else: assert False, rng
         res.append(p[1].format(s0, rng[1]))
     if 'weight' not in skip:
@@ -371,6 +371,8 @@ def query(request):
                 if performance in ask_performance:
                     perffn = ask_performance[performance][0]
                     msg = perffn(status['last_products'][0])
+                else:
+                    msg = random_nlg('dont_know', {})
             if act == 'ask_performance_all':
                 status['config_exist'] = True
                 msg = perfs.cpu(status['last_products'][0]) + perfs.gpu(status['last_products'][0])
