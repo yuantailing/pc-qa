@@ -8,10 +8,10 @@ property.*不够	property_inc	10
 property.*浪费	property_dec	9
 property.*跟不上	property_inc	9
 
-property(?:至少|最少|大于|高于|不低于|不小于).*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T)	property_assign_gt	10
-property(?:至多|最多|小于|低于|不高于|不大于).*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T)	property_assign_lt	10
-property.*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T).*以上	property_assign_gt	10
-property.*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T).*以下	property_assign_lt	10
+property(?:至少|最少|大于|高于|不低于|不小于).*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T)	property_assign_gte	10
+property(?:至多|最多|小于|低于|不高于|不大于).*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T)	property_assign_lte	10
+property.*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T).*以上	property_assign_gte	10
+property.*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T).*以下	property_assign_lte	10
 property(?:要|等于|正好|恰好|就要|).*(?P<num_str>\d+(?:\.\d+)?)(?P<unit_str>G|T)	property_assign_eq	9
 
 贵了|太贵|不便宜|(?:价格|价钱)要?低	price_dec	10
