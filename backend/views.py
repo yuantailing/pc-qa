@@ -32,7 +32,7 @@ def random_nlg(act_type, kw):
     assert(0 < len(all))
     return random.sample(all, 1)[0]['output']
 
-def constraints_in_native(status):
+def constraints_in_native(status, skip):
     def native_brand(v):
         v.sort(key=lambda b: (b == 'others', b))
         d = {
@@ -50,10 +50,11 @@ def constraints_in_native(status):
             }
         return [d[s] for s in v]
     res = []
-    if status['brand']['in']:
-        res.append('品牌只要{0}'.format('、'.join(native_brand(status['brand']['in']))))
-    elif status['brand']['not']:
-        res.append('品牌不要{0}'.format('、'.join(native_brand(status['brand']['not']))))
+    if 'brand' not in skip:
+        if status['brand']['in']:
+            res.append('品牌只要{0}'.format('、'.join(native_brand(status['brand']['in']))))
+        elif status['brand']['not']:
+            res.append('品牌不要{0}'.format('、'.join(native_brand(status['brand']['not']))))
     prop_limits = [
         ('price', '价格{0}{1}元'),
         ('cpu', 'CPU{0}{1}GHz'),
@@ -64,6 +65,7 @@ def constraints_in_native(status):
         ('market_date', '上市时间{0}{1}'),
     ]
     for p in prop_limits:
+        if p[0] in skip: continue
         rng = status[p[0]]
         if rng[0] is None: continue
         elif rng[0] == 'gt': s0 = '大于'
@@ -73,10 +75,11 @@ def constraints_in_native(status):
         elif rng[0] == 'eq': s0 = '是'
         else: assert False, rng
         res.append(p[1].format(s0, rng[1]))
-    if status['weight'][0] is not None:
-        assert status['weight'] == ['lte', 1.5]
-        res.append('便携（小于1.5Kg）')
-    return '。您的选项是：' + '，'.join(res)
+    if 'weight' not in skip:
+        if status['weight'][0] is not None:
+            assert status['weight'] == ['lte', 1.5]
+            res.append('便携（小于1.5Kg）')
+    return '。您的选项是：' + '，'.join(res) if res else ''
 
 def json_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -165,7 +168,7 @@ def query(request):
             msg = random_nlg('brand_no', {'brand': bd})
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '不是' + bd}) + constraints_in_native(status)
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + bd}) + constraints_in_native(status, 'brand')
             else:
                 msg = random_nlg('brand_no', {'brand': bd})
         elif act == 'brand_assign':
@@ -177,7 +180,7 @@ def query(request):
                 status['brand']['not'].remove(regular_bd)
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': bd}) + constraints_in_native(status)
+                msg = random_nlg('config_change_failed', {'item_change': bd}) + constraints_in_native(status, 'brand')
             else:
                 msg = random_nlg('brand_assign', {'brand': bd})
         # color
@@ -196,7 +199,7 @@ def query(request):
                 status['color']['not'].append(regular_cl)
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': '不是' + cl + '色'}) + constraints_in_native(status)
+                msg = random_nlg('config_change_failed', {'item_change': '不是' + cl + '色'}) + constraints_in_native(status, 'color')
             else:
                 msg = random_nlg('color_no', {'color': cl})
         elif act == 'color_assign':
@@ -209,7 +212,7 @@ def query(request):
             friendly_display(status['color'])
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('config_change_failed', {'item_change': cl + '色'}) + constraints_in_native(status)
+                msg = random_nlg('config_change_failed', {'item_change': cl + '色'}) + constraints_in_native(status, 'color')
             else:
                 msg = random_nlg('color_assign', {'color': cl})
         # portable
@@ -218,7 +221,7 @@ def query(request):
             status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('protable_failed', {}) + constraints_in_native(status)
+                msg = random_nlg('protable_failed', {}) + constraints_in_native(status, 'weight')
             else:
                 msg = random_nlg('portable', {})
         # long battery life
@@ -227,7 +230,7 @@ def query(request):
             status['config_exist'] = True
             if len(search_once(status)) < 1:
                 status = old_status
-                msg = random_nlg('long_battery_life_failed', {}) + constraints_in_native(status)
+                msg = random_nlg('long_battery_life_failed', {}) + constraints_in_native(status, 'battery_life')
             else:
                 msg = random_nlg('long_battery_life', {})
         # application
@@ -263,6 +266,21 @@ def query(request):
                 msg = random_nlg('rollback', {})
             else:
                 msg = random_nlg('dont_know', {})
+        elif act in ('property_assign_gt', 'property_assign_lt', 'property_assign_eq'):
+            direction = act.split('_')[2]
+            num = float(pattern['num_str'][0])
+            unit_str = pattern['unit_str'][0]
+            prop = pattern['_regular']['property'][0]
+            if num == int(num): num = int(num)
+            if prop in ('memory', 'disk'):
+                status[prop] = [direction, num * 1000 if unit_str == 'T' else num]
+                translated_direction = {'gt': '大于', 'lt': '小于', 'eq': '等于'}[direction]
+                translated_prop = {'memory': '内存', 'disk': '硬盘'}[prop]
+                if len(search_once(status)) < 1:
+                    status = old_status
+                    msg = random_nlg('config_change_failed', {'item_change': translated_prop + translated_direction + str(num) + unit_str}) + constraints_in_native(status, prop)
+                else:
+                    msg = random_nlg('config_change', {'item_change': translated_prop + translated_direction + str(num) + unit_str})
         
         if status.get('last_products'):
             # price
@@ -273,7 +291,7 @@ def query(request):
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
                     status = old_status
-                    msg = random_nlg('price_dec_failed', {}) + constraints_in_native(status)
+                    msg = random_nlg('price_dec_failed', {}) + constraints_in_native(status, 'price')
                 else:
                     msg = random_nlg('price_dec', {})
             elif act == 'price_limit':
@@ -282,7 +300,7 @@ def query(request):
                 status['price_pos'] = 0.8
                 if len(search_once(status)) < 1:
                     status = old_status
-                    msg = random_nlg('price_limit_failed', {'price': pattern['price_str'][0]}) + constraints_in_native(status)
+                    msg = random_nlg('price_limit_failed', {'price': pattern['price_str'][0]}) + constraints_in_native(status, 'price')
                 else:
                     msg = random_nlg('price_limit', {'price': pattern['price_str'][0]})
             elif act == 'price_limit_cancle':
@@ -319,7 +337,7 @@ def query(request):
                 status['config_exist'] = True
                 if len(search_once(status)) < 1:
                     status = old_status
-                    msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]}) + constraints_in_native(status)
+                    msg = random_nlg('config_change_failed', {'item_change': nlgparam[1] if len(nlgparam) > 1 else nlgparam[0]}) + constraints_in_native(status, 'property')
                 else:
                     msg = random_nlg('config_change', {'item_change': nlgparam[0]})
 
@@ -332,8 +350,9 @@ def query(request):
             if act == 'ask_performance':
                 status['config_exist'] = True
                 performance = pattern['_regular']['performance'][0]
-                perffn = ask_performance[performance][0]
-                msg = perffn(status['last_products'][0])
+                if performance in ask_performance:
+                    perffn = ask_performance[performance][0]
+                    msg = perffn(status['last_products'][0])
             if act == 'ask_performance_all':
                 status['config_exist'] = True
                 msg = perfs.cpu(status['last_products'][0]) + perfs.gpu(status['last_products'][0])
