@@ -281,7 +281,7 @@ def query(request):
             if num == int(num): num = int(num)
             if prop in ('memory', 'disk'):
                 status[prop] = [direction, num * 1000 if unit_str == 'T' else num]
-                translated_direction = {'gte': '至少', 'lte': '至多', 'eq': '等于'}[direction]
+                translated_direction = {'gte': '至少', 'lte': '至多', 'eq': ''}[direction]
                 translated_prop = {'memory': '内存', 'disk': '硬盘'}[prop]
                 if len(search_once(status)) < 1:
                     status = old_status
