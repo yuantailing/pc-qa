@@ -5,6 +5,7 @@ Usage
 -----
 
 ```
+$ git submodule update --init --recursive
 $ pip install -r requirements.txt
 $ pip install -r localqa/requirements
 $ cp qa/settings.py.sample qa/settings.py
